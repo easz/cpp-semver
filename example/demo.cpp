@@ -1,11 +1,5 @@
-## cpp-semver
-
-Semver implemented in C++
-
-### demo
-
-```c++
 #include "cpp-semver.hpp"
+
 #include <iostream>
 
 int main()
@@ -36,5 +30,3 @@ int main()
 
   return 0;
 }
-```
-

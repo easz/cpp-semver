@@ -1,0 +1,179 @@
+#ifndef CPP_SEMVER_TYPE_HPP
+#define CPP_SEMVER_TYPE_HPP
+
+
+#include <string>
+#include <vector>
+#include <memory>
+
+namespace semver
+{
+  // ------------ exception types ------------------------------------ //
+
+  struct semver_error : public std::runtime_error
+  {
+    semver_error(const std::string& msg) : std::runtime_error(msg) {}
+  };
+
+  // ------------ syntax types ------------------------------------ //
+
+  struct syntax
+  {
+    /*
+    * original NPM semver syntax grammar: https://docs.npmjs.com/misc/Syntax#range-grammar
+    *
+    * range-set  ::= range ( logical-or range ) *
+    * logical-or ::= ( ' ' ) * '||' ( ' ' ) *
+    * range      ::= hyphen | simple ( ' ' simple ) * | ''
+    * hyphen     ::= partial ' - ' partial
+    * simple     ::= primitive | partial | tilde | caret
+    * primitive  ::= ( '<' | '>' | '>=' | '<=' | '=' | ) partial
+    * partial    ::= xr ( '.' xr ( '.' xr qualifier ? )? )?
+    * xr         ::= 'x' | 'X' | '*' | nr
+    * nr         ::= '0' | ['1'-'9'] ( ['0'-'9'] ) *
+    * tilde      ::= '~' partial
+    * caret      ::= '^' partial
+    * qualifier  ::= ( '-' pre )? ( '+' build )?
+    * pre        ::= parts
+    * build      ::= parts
+    * parts      ::= part ( '.' part ) *
+    * part       ::= nr | [-0-9A-Za-z]+
+    */
+
+    enum class comparator
+    {
+      eq, lt, lte, gt, gte, tilde, caret
+    };
+
+    /// represents any type of 'simple', 'primitive', 'partial', 'tilde' or 'caret' from the grammar.
+    /// The default value represents *.*.*
+    struct simple
+    {
+      std::unique_ptr<int> major;
+      std::unique_ptr<int> minor;
+      std::unique_ptr<int> patch;
+
+      std::string pre = "";
+      std::string build = "";
+
+      comparator cmp = comparator::eq;
+    };
+
+    /// intersection set (i.e. AND conjunction )
+    typedef std::vector< simple > range;
+
+    /// union set (i.e. OR conjunction )
+    typedef std::vector< range > range_set;
+  };
+
+  // ------------ semantic types ------------------------------------ //
+
+  struct semantic
+  {
+    struct boundary
+    {
+      int major = 0;
+      int minor = 0;
+      int patch = 0;
+      std::string pre = "";
+      bool is_max = false;
+
+      /// Represent a minimal version boundary
+      static boundary min()
+      {
+        boundary b;
+        b.pre = "-"; // the prerelease '0.0.0--' is less than '0.0.0'
+        return b;
+      }
+
+      /// Represent a maximal version boundary
+      static boundary max()
+      {
+        boundary b;
+        b.is_max = true;
+        return b;
+      }
+    };
+
+    struct interval
+    {
+      bool from_inclusive = true;
+      bool to_inclusive   = true;
+      boundary from = boundary::min();
+      boundary to   = boundary::max();
+    };
+
+    /// interval set (i.e. OR conjunction )
+    typedef std::vector< interval > interval_set;
+  };
+
+  bool operator ==(const semantic::boundary& lhs, const semantic::boundary& rhs)
+  {
+    return (lhs.major == rhs.major) &&
+      (lhs.minor == rhs.minor) &&
+      (lhs.patch == rhs.patch) &&
+      (lhs.pre == rhs.pre) &&
+      (lhs.is_max == rhs.is_max);
+  }
+
+  bool operator !=(const semantic::boundary& lhs, const semantic::boundary& rhs)
+  {
+    return !(lhs == rhs);
+  }
+
+  bool operator <(const semantic::boundary& lhs, const semantic::boundary& rhs)
+  {
+    // TODO: improve the performance of comparison
+
+    // XXX: is_max case
+    if (lhs.is_max || rhs.is_max)       
+      return !lhs.is_max && rhs.is_max; // 1.2.3 < max
+
+    if (lhs.major < rhs.major)      // 1.* < 2.*
+      return true;
+
+    if ((lhs.major == rhs.major) && // 1.2.* < 1.3.*
+      (lhs.minor < rhs.minor))
+      return true;
+
+    if ((lhs.major == rhs.major) && // 1.2.3 < 1.2.4
+      (lhs.minor == rhs.minor) &&
+      (lhs.patch < rhs.patch))
+      return true;
+
+    // XXX: pre-release case
+    if ((lhs.major == rhs.major) && // 1.2.3-alpha < 1.2.3
+      (lhs.minor == rhs.minor) &&
+      (lhs.patch == rhs.patch) &&
+      (!lhs.pre.empty() && rhs.pre.empty()))
+      return true;
+
+    // XXX: pre-release case
+    if ((lhs.major == rhs.major) && // 1.2.3-alpha < 1.2.3-beta
+      (lhs.minor == rhs.minor) &&
+      (lhs.patch == rhs.patch) &&
+      (!lhs.pre.empty() && !rhs.pre.empty()) &&
+      (lhs.pre < rhs.pre))
+      return true;
+
+    return false;
+  }
+
+  bool operator >(const semantic::boundary& lhs, const semantic::boundary& rhs)
+  {
+    return (lhs != rhs) && !(lhs < rhs);
+  }
+
+  bool operator <=(const semantic::boundary& lhs, const semantic::boundary& rhs)
+  {
+    return (lhs < rhs) || (lhs == rhs);
+  }
+
+  bool operator >=(const semantic::boundary& lhs, const semantic::boundary& rhs)
+  {
+    return (lhs > rhs) || (lhs == rhs);
+  }
+
+}
+
+#endif
