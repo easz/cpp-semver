@@ -2,6 +2,9 @@
 
 Semver implemented in C++
 
+ * attempt to implement [NPM's Semver](https://docs.npmjs.com/misc/semver)
+ * demo using [PEGTL parser](https://github.com/taocpp/PEGTL)
+
 ### demo
 
 ```c++
