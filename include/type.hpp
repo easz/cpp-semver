@@ -126,7 +126,7 @@ namespace semver
     // TODO: improve the performance of comparison
 
     // XXX: is_max case
-    if (lhs.is_max || rhs.is_max)       
+    if (lhs.is_max || rhs.is_max)
       return !lhs.is_max && rhs.is_max; // 1.2.3 < max
 
     if (lhs.major < rhs.major)      // 1.* < 2.*

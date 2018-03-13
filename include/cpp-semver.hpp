@@ -20,7 +20,7 @@ namespace semver
   semantic::interval parse(const syntax::simple& input)
   {
     // default result * := [min, max]
-    semantic::interval result; 
+    semantic::interval result;
 
     semantic::boundary b; // associate boundary from input x.y.z-pre
                           // replace * with 0
@@ -32,17 +32,17 @@ namespace semver
     switch (input.cmp)
     {
     case syntax::comparator::lt:         // <x.y.z-pre := [min, x.y.z-pre)
-      
+
       result.to_inclusive = false;
       result.to = b;
 
       if (!input.major || !input.minor || !input.patch)  // <x.*-pre   := [min, x.0.0)
         result.to.pre = "";                              // <x.y.*-pre := [min, x,y.0)
-      
+
       break;
 
     case syntax::comparator::lte:        // <=x.y.z.pre := [min, x.y.z-pre]
-      
+
       result.to = b;
 
       if (!input.major || !input.minor || !input.patch)  // <=x.*-pre   := [min, 'x+1'.0.0)
@@ -62,7 +62,7 @@ namespace semver
       }
       else if (!input.patch)             // <=x.y.*-pre := [min, x,'y+1'.0)
       {
-        result.to.minor += 1;       
+        result.to.minor += 1;
       }
 
       break;
@@ -70,7 +70,7 @@ namespace semver
     case syntax::comparator::gt:         // >x.y.z-pre := (x.y.z-pre, max]
       result.from_inclusive = false;
       result.from = b;
-      
+
       if (!input.major || !input.minor || !input.patch)  // >x.*-pre   := ['x+1', max]
       {                                                  // >x.y.*-pre := [x.'y+1', max]
         result.from_inclusive = true;
@@ -94,7 +94,7 @@ namespace semver
       break;
 
     case syntax::comparator::gte:        // >=x.y.z-pre := [x.y.z-pre, max]
-      
+
       result.from = b;
 
       if (!input.major || !input.minor || !input.patch)  // >=x.*-pre   := [x.0.0, max]
@@ -112,7 +112,7 @@ namespace semver
 
       result.to_inclusive = false;
       result.to.pre = "";
-      
+
       if (!input.major)              // ^* := [min, max]
       {
         result = semantic::interval();
@@ -156,7 +156,7 @@ namespace semver
       {
         result.from.pre = "";
 
-        result.to.major += 1;   
+        result.to.major += 1;
         result.to.minor = 0;
         result.to.patch = 0;
       }
@@ -185,11 +185,11 @@ namespace semver
       if (!input.major)                  // * := [min, max]
       {
         result = semantic::interval();
-      }      
+      }
       else if (!input.minor)             // x := [x.0.0, 'x+1'.0.0)
       {
         result.from.patch = 0;
-        
+
         result.to.major += 1;
         result.to.patch = 0;
       }
@@ -276,7 +276,7 @@ namespace semver
         result.to_inclusive = span.to_inclusive;
       }
     }
- 
+
     if ((result.from > result.to) ||
         ((result.from == result.to) && (result.from_inclusive != result.to_inclusive)))
       return nullptr;
@@ -291,7 +291,7 @@ namespace semver
     for (const syntax::range& range : input)
     {
       std::vector<semantic::interval> and_set;
-      for (const syntax::simple& simple : range)      
+      for (const syntax::simple& simple : range)
         and_set.emplace_back(parse(simple));
       const std::unique_ptr<semantic::interval> conj = and_conj(and_set);
       if (conj)
@@ -299,7 +299,7 @@ namespace semver
     }
     return or_set;
   }
-  
+
   /** check if two @c semantic::interval_set intersect with each other */
   bool intersects(const semantic::interval_set& s1, const semantic::interval_set& s2)
   {

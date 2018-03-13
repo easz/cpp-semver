@@ -16,32 +16,32 @@ namespace semver
 
   // XXX: extra rules for less strict whitespace matching
   struct some_space : p::plus< p::space > {};
-  struct any_space  : p::star< p::space > {};  
+  struct any_space  : p::star< p::space > {};
 
   // '0' | ['1'-'9'] ( ['0'-'9'] ) *
-  struct nr : p::sor< p::one<'0'>,                                                
+  struct nr : p::sor< p::one<'0'>,
                       p::seq< p::ranges<'1', '9'>, p::star< p::ranges<'0', '9'> > >
                     > {};
 
   // 'x' | 'X' | '*' | nr
-  struct xr : p::sor< p::one<'x', 'X', '*'>, nr > {};     
+  struct xr : p::sor< p::one<'x', 'X', '*'>, nr > {};
 
   // nr | [-0-9A-Za-z]+
-  struct part : p::sor< nr,                                                         
+  struct part : p::sor< nr,
                         p::plus< p::ranges<'a', 'z', 'A', 'Z', '0', '9', '-'> >
                       > {};
 
   // part ( '.' part ) *
-  struct parts : p::seq< part, p::star< p::one<'.'>, part > > {};                    
+  struct parts : p::seq< part, p::star< p::one<'.'>, part > > {};
 
   // parts
-  struct build : parts {};                                                           
+  struct build : parts {};
 
   // parts
-  struct pre : parts {}; 
+  struct pre : parts {};
 
   // ( '-' pre )? ( '+' build )?
-  struct qualifier : p::seq< p::opt< p::seq< p::one<'-'>, pre > >,                       
+  struct qualifier : p::seq< p::opt< p::seq< p::one<'-'>, pre > >,
                              p::opt< p::seq< p::one<'+'>, build > >
                            > {};
 
@@ -52,7 +52,7 @@ namespace semver
 
   // xr ( '.' xr ( '.' xr qualifier ? )? )?
   // XXX: accepting leading optional 'v'
-  struct partial : p::seq< p::opt< p::one<'v'> >,                                        
+  struct partial : p::seq< p::opt< p::one<'v'> >,
                            partial_major,
                            p::opt< p::one<'.'>,
                                    partial_minor,
@@ -62,12 +62,12 @@ namespace semver
                                          >
                                   >
                           > {};
-  
+
   // '~' partial
-  struct tilde : p::seq< p::one<'~'>, partial > {};                           
+  struct tilde : p::seq< p::one<'~'>, partial > {};
 
   // '^' partial
-  struct caret : p::seq< p::one<'^'>, partial > {};                           
+  struct caret : p::seq< p::one<'^'>, partial > {};
 
   // XXX: extra rules to capture comparator
   struct primitive_op_lte : p::string<'<','='> {};
@@ -78,7 +78,7 @@ namespace semver
 
   // ( '<' | '>' | '>=' | '<=' | '=' | ) partial
   // XXX: rule order matters!
-  struct primitive : p::seq< p::sor< primitive_op_lte,                           
+  struct primitive : p::seq< p::sor< primitive_op_lte,
                                      primitive_op_gte,
                                      primitive_op_gt,
                                      primitive_op_lt,
@@ -89,10 +89,10 @@ namespace semver
                            > {};
 
   // primitive | partial | tilde | caret
-  struct simple : p::sor< primitive, partial, tilde, caret > {};              
+  struct simple : p::sor< primitive, partial, tilde, caret > {};
 
   // partial ' - ' partial
-  struct hyphen : p::seq< partial,                                            
+  struct hyphen : p::seq< partial,
                           some_space,
                           p::one<'-'>,
                           some_space,
@@ -100,7 +100,7 @@ namespace semver
                         > {};
 
   // hyphen | simple ( ' ' simple ) * | ''
-  struct range : p::sor< hyphen,                                             
+  struct range : p::sor< hyphen,
                          p::seq< simple,
                                  p::star< some_space, simple >
                                >,
@@ -108,13 +108,13 @@ namespace semver
                        > {};
 
   // ( ' ' ) * '||' ( ' ' ) *
-  struct logical_or : p::seq< any_space,                                          
+  struct logical_or : p::seq< any_space,
                               p::string<'|','|'>,
                               any_space
                             > {};
 
   // range ( logical-or range ) *
-  struct range_set : p::must< p::seq< any_space,                                 
+  struct range_set : p::must< p::seq< any_space,
                                       range,
                                       p::star< logical_or, range >,
                                       any_space,
@@ -191,7 +191,7 @@ namespace semver
         stacks.partial = std::make_unique< semver::syntax::simple >();
 
       try
-      { // parse a number 
+      { // parse a number
         stacks.partial->major = std::make_unique<int>(std::stoi(in.string()));
       }
       catch (std::invalid_argument&)
