@@ -173,6 +173,41 @@ namespace semver
     return (lhs > rhs) || (lhs == rhs);
   }
 
+  bool operator ==(const semantic::interval& lhs, const semantic::interval& rhs)
+  {
+    return (lhs.from_inclusive == rhs.from_inclusive) &&
+      (lhs.to_inclusive == rhs.to_inclusive) &&
+      (lhs.from == rhs.from) &&
+      (lhs.to == rhs.to);
+  }
+
+  bool operator !=(const semantic::interval& lhs, const semantic::interval& rhs)
+  {
+    return !(lhs == rhs);
+  }
+
+  bool operator <(const semantic::interval& lhs, const semantic::interval& rhs)
+  {
+    if (lhs.to < rhs.from ||
+      (lhs.to == rhs.from && (!lhs.to_inclusive || !rhs.from_inclusive)))
+      return true;
+    return false;
+  }
+
+  bool operator <=(const semantic::interval& lhs, const semantic::interval& rhs)
+  {
+    return (lhs < rhs) || (lhs == rhs);
+  }
+
+  bool operator >(const semantic::interval& lhs, const semantic::interval& rhs)
+  {
+    return (lhs != rhs) && !(lhs < rhs);
+  }
+
+  bool operator >=(const semantic::interval& lhs, const semantic::interval& rhs)
+  {
+    return (lhs > rhs) || (lhs == rhs);
+  }
 }
 
 #endif

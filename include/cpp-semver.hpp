@@ -223,17 +223,17 @@ namespace semver
 
       for (size_t i = 1; i < size; i++)
       {
-        const auto& span = input.at(i);
+        const semantic::interval& span = input.at(i);
 
         // prerelease tag case
         {
-          const bool result_is_range = (result.from != result.to);
-          const bool span_is_range = (span.from != span.to);
+          const bool result_is_range = (result.from != result.to || result.from_inclusive != result.to_inclusive);
+          const bool span_is_range = (span.from != span.to || span.from_inclusive != span.to_inclusive);
 
           if (result_is_range != span_is_range)
           {
-            const auto& range = (result_is_range ? result : span);
-            const auto& target = (result_is_range ? span : result);
+            const semantic::interval& range = (result_is_range ? result : span);
+            const semantic::interval& target = (result_is_range ? span : result);
             const bool range_from_has_pre = !range.from.pre.empty();
             const bool range_to_has_pre = !range.to.pre.empty();
             const bool target_has_pre = !target.from.pre.empty();
@@ -330,16 +330,20 @@ namespace semver
     }
   }
 
+
+  // *************** API **************************************** //
+
+
   /** Return true if the comparator or range intersect */
-  bool intersects(const std::string& v)
+  bool intersects(const std::string& range)
   {
-    return detail::intersects(detail::parse(v), detail::parse("*"));
+    return detail::intersects(detail::parse(range), detail::parse("*"));
   }
 
   /** Return true if the two supplied ranges or comparators intersect. */
-  bool intersects(const std::string& v1, const std::string& v2)
+  bool intersects(const std::string& range1, const std::string& range2)
   {
-    return detail::intersects(detail::parse(v1), detail::parse(v2));
+    return detail::intersects(detail::parse(range1), detail::parse(range2));
   }
 
   /**  Return true if the version satisfies the range */
@@ -348,6 +352,105 @@ namespace semver
     return detail::intersects(detail::parse(version), detail::parse(range));
   }
 
+  /** v1 == v2 */
+  bool eq(const std::string& v1, const std::string& v2)
+  {
+    semantic::interval_set interval_set_1 = detail::parse(detail::parse(v1));
+    semantic::interval_set interval_set_2 = detail::parse(detail::parse(v2));
+
+    if (interval_set_1.empty() && interval_set_2.empty())
+      return true;
+    else if (interval_set_1.empty() != interval_set_2.empty())
+      return false;
+
+    for (const semantic::interval& interval_1 : interval_set_1)
+      for (const semantic::interval& interval_2 : interval_set_2)
+        if (interval_1 == interval_2)
+          return true;
+
+    return false;
+  }
+
+  /** v1 > v2 */
+  bool gt(const std::string& v1, const std::string& v2)
+  {
+    semantic::interval_set interval_set_1 = detail::parse(detail::parse(v1));
+    semantic::interval_set interval_set_2 = detail::parse(detail::parse(v2));
+
+    if (!interval_set_1.empty() && interval_set_2.empty())
+      return true;
+    else if (interval_set_1.empty() || interval_set_2.empty())
+      return false;
+
+    for (const semantic::interval& interval_1 : interval_set_1)
+      for (const semantic::interval& interval_2 : interval_set_2)
+        if (interval_1 > interval_2)
+          return true;
+    
+    return false;
+  }
+
+  /** v1 >= v2 */
+  bool gte(const std::string& v1, const std::string& v2)
+  {
+    if (eq(v1, v2) || gt(v1, v2))
+      return true;
+    return false;
+  }
+
+  /** v1 < v2 */
+  bool lt(const std::string& v1, const std::string& v2)
+  {
+    if (!eq(v1, v2) && !gt(v1, v2))
+      return true;
+    return false;
+  }
+
+  /** v1 <= v2 */
+  bool lte(const std::string& v1, const std::string& v2)
+  {
+    if (eq(v1, v2) || lt(v1, v2))
+      return true;
+    return false;
+  }
+
+  /** Return true if version is greater than all the versions possible in the range. */
+  bool gtr(const std::string& version, const std::string& range)
+  {
+    semantic::interval_set interval_set_v = detail::parse(detail::parse(version));
+    semantic::interval_set interval_set_r = detail::parse(detail::parse(range));
+
+    if (!interval_set_v.empty() && interval_set_r.empty())
+      return true;
+    else if (interval_set_v.empty() || interval_set_r.empty())
+      return false;
+
+    for (const semantic::interval& interval_v : interval_set_v)
+      for (const semantic::interval& interval_r : interval_set_r)
+        if (interval_v <= interval_r)
+          return false;
+
+    return true;
+  }
+
+  /** Return true if version is less than all the versions possible in the range. */
+  bool ltr(const std::string& version, const std::string& range)
+  {
+    semantic::interval_set interval_set_v = detail::parse(detail::parse(version));
+    semantic::interval_set interval_set_r = detail::parse(detail::parse(range));
+
+    if (interval_set_v.empty() && !interval_set_r.empty())
+      return true;
+    else if (interval_set_v.empty() || interval_set_r.empty())
+      return false;
+
+    for (const semantic::interval& interval_v : interval_set_v)
+      for (const semantic::interval& interval_r : interval_set_r)
+        if (interval_v >= interval_r)
+          return false;
+
+    return true;
+  }
 }
 
 #endif
