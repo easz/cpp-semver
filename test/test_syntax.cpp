@@ -22,6 +22,6 @@ void run_test()
   for (const auto& input : syntax_not_ok)
   {
     std::cout << "[Test] syntax error \"" << input << "\"" << std::endl;
-    TEST_THROWS(semver::semver_error, semver::parse(input));
+    TEST_THROWS(semver::semver_error, semver::detail::parse(input));
   }
 }

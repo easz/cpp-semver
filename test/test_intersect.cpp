@@ -328,37 +328,52 @@ const std::vector<
   },
 };
 
+const std::vector<std::string> intersected_comp
+{
+  "1.0.0", ">=1.0.0", ">=1.0.0 <2.0.0", "<1.0.0 || >2.0.0"
+};
+
+const std::vector<std::string> not_intersected_comp
+{
+  "<=1.0.0 >2.0.0", "1.0.0 >2.0.0"
+};
 
 void run_test()
 {
+  for (const auto& input : intersected_comp)
+  {
+    std::cout << "[Test] intersects( \"" << input << "\" )" << std::endl;
+    TEST_ASSERT(semver::intersects(input));
+  }
+  
+  for (const auto& input : not_intersected_comp)
+  {
+    std::cout << "[Test] !intersects( \"" << input << "\" )" << std::endl;
+    TEST_ASSERT(!semver::intersects(input));
+  }
+
   for (const auto& tpl : test_data)
   {
     const auto& input = std::get<0>(tpl);
     const auto& intersected = std::get<1>(tpl);
     const auto& not_intersected = std::get<2>(tpl);
 
-    const auto v1 = semver::parse(input);
-
     for (const auto& match : intersected)
     {
-      const auto v2 = semver::parse(match);
-      
       std::cout << "[Test] intersects( \"" << input << "\", \"" << match << "\" )" << std::endl;
-      TEST_ASSERT( semver::intersects(v1, v2) );
+      TEST_ASSERT(semver::intersects(input, match));
 
       std::cout << "[Test] intersects( \"" << match << "\", \"" << input << "\" )" << std::endl;
-      TEST_ASSERT( semver::intersects(v2, v1) );
+      TEST_ASSERT(semver::intersects(match, input));
     }
 
     for (const auto& not_match : not_intersected)
     {
-      const auto v2 = semver::parse(not_match);
-
       std::cout << "[Test] !intersects( \"" << input << "\", \"" << not_match << "\" )" << std::endl;
-      TEST_ASSERT( !semver::intersects(v1, v2) );
+      TEST_ASSERT(!semver::intersects(input, not_match));
 
       std::cout << "[Test] !intersects( \"" << not_match << "\", \"" << input << "\" )" << std::endl;
-      TEST_ASSERT( !semver::intersects(v2, v1) );
+      TEST_ASSERT(!semver::intersects(not_match, input));
     }
 
   }
