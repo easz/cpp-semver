@@ -2,9 +2,9 @@
 
 Semver implemented in C++
 
- * attempt to implement [NPM's Semver](https://docs.npmjs.com/misc/semver) feature in C++11
+ * attempt to implement significant features from [npm semver](https://docs.npmjs.com/misc/semver) in C++11
  * optinoal using [PEGTL parser](https://github.com/taocpp/PEGTL)
- * implemented API functions
+ * implemented API
    * ```semver::intersects( string[, string] )```: Return true if the given version ranges or comparators intersect.
    * ...
 
