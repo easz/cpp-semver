@@ -451,6 +451,21 @@ namespace semver
 
     return true;
   }
+
+  /** Return true if the version or range is valid */
+  bool valid(const std::string& s)
+  {
+    try
+    {
+      semantic::interval_set interval_set_s = detail::parse(detail::parse(s));
+      return !interval_set_s.empty();
+    }
+    catch (semver_error const&)
+    {
+      return false;
+    }
+  }
+
 }
 
 #endif
