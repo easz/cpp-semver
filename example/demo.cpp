@@ -26,5 +26,17 @@ int main()
       << "intersected." << std::endl;
   }
 
+  {
+    const std::string ver = "1.2.3";
+    const std::string range = "1.x || >=2.5.0 || 5.0.0 - 7.2.3";
+
+    const bool satisfied = semver::satisfies(ver, range);
+
+    std::cout << "\"" << ver
+      << "\" is " << (satisfied ? "" : "not ")
+      << "satisfied by "
+      << "\"" << range << "\"." << std::endl;
+  }
+
   return 0;
 }

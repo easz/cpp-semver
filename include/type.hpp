@@ -81,9 +81,7 @@ namespace semver
       /// Represent a minimal version boundary
       static boundary min()
       {
-        boundary b;
-        b.pre = "-"; // the prerelease '0.0.0--' is less than '0.0.0'
-        return b;
+        return {};
       }
 
       /// Represent a maximal version boundary
@@ -95,6 +93,7 @@ namespace semver
       }
     };
 
+    /// default interval is *.*.* := [min, max]
     struct interval
     {
       bool from_inclusive = true;

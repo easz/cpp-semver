@@ -330,16 +330,22 @@ namespace semver
     }
   }
 
-  /** check if a comparator intersects */
-  bool intersects(const std::string& comp)
+  /** Return true if the comparator or range intersect */
+  bool intersects(const std::string& v)
   {
-    return detail::intersects(detail::parse(comp), detail::parse("*"));
+    return detail::intersects(detail::parse(v), detail::parse("*"));
   }
 
-  /** check if two version ranges or comparators intersect with each other */
-  bool intersects(const std::string& str1, const std::string& str2)
+  /** Return true if the two supplied ranges or comparators intersect. */
+  bool intersects(const std::string& v1, const std::string& v2)
   {
-    return detail::intersects(detail::parse(str1), detail::parse(str2));
+    return detail::intersects(detail::parse(v1), detail::parse(v2));
+  }
+
+  /**  Return true if the version satisfies the range */
+  bool satisfies(const std::string& version, const std::string& range)
+  {
+    return detail::intersects(detail::parse(version), detail::parse(range));
   }
 
 }
