@@ -2,7 +2,14 @@
 #define CPP_SEMVER_HPP
 
 #include "type.hpp"
-#include "peg.hpp" // parsing with PETGTL
+
+//#ifdef USE_PEGTL
+#include "parser/peg.hpp" // parsing with PETGTL
+#define RUN_PARSER peg_parser
+//#else
+//#include "parser/parser.hpp" // parsing with default parser
+//#define RUN_PARSER default_parser
+//#endif
 
 #include <string>
 #include <vector>
@@ -10,13 +17,13 @@
 
 namespace semver
 {
-  /** parse version range in string into syntactical representation @c syntax::range_set */
+  /* parse version range in string into syntactical representation @c syntax::range_set */
   syntax::range_set parse(const std::string& input)
   {
-    return peg_parse(input); // parsing with PETGTL
+    return RUN_PARSER(input);
   }
 
-  /** parse syntactical representation @c syntax::simple and convert it to sementical representation @c semantic::interval */
+  /* parse syntactical representation @c syntax::simple and convert it to sementical representation @c semantic::interval */
   semantic::interval parse(const syntax::simple& input)
   {
     // default result * := [min, max]
@@ -202,7 +209,7 @@ namespace semver
     return result;
   };
 
-  /** calculate AND-conjunction from a list of @c semantic::interval */
+  /* calculate AND-conjunction from a list of @c semantic::interval */
   std::unique_ptr<semantic::interval> and_conj(const std::vector< semantic::interval >& input)
   {
     const size_t size = input.size();
@@ -281,10 +288,10 @@ namespace semver
         ((result.from == result.to) && (result.from_inclusive != result.to_inclusive)))
       return nullptr;
 
-    return std::make_unique<semantic::interval>(result);
+    return std::unique_ptr<semantic::interval>( new semantic::interval(result) );
   }
 
-  /** parse syntactical representation @c syntax::range_set and convert it to sementical representation @c semantic::interval_set */
+  /* parse syntactical representation @c syntax::range_set and convert it to sementical representation @c semantic::interval_set */
   semantic::interval_set parse(const syntax::range_set& input)
   {
     semantic::interval_set or_set;
@@ -300,7 +307,7 @@ namespace semver
     return or_set;
   }
 
-  /** check if two @c semantic::interval_set intersect with each other */
+  /* check if two @c semantic::interval_set intersect with each other */
   bool intersects(const semantic::interval_set& s1, const semantic::interval_set& s2)
   {
     if (s1.empty() || s2.empty())
@@ -314,7 +321,7 @@ namespace semver
     return false;
   }
 
-  /** check if two @c syntax::range_set intersect with each other */
+  /* check if two @c syntax::range_set intersect with each other */
   bool intersects(const syntax::range_set& rs1, const syntax::range_set& rs2)
   {
     return intersects(parse(rs1), parse(rs2));

@@ -1,7 +1,7 @@
-#ifndef CPP_syntax_PEG_HPP
-#define CPP_syntax_PEG_HPP
+#ifndef CPP_SEMVER_PEG_HPP
+#define CPP_SEMVER_PEG_HPP
 
-#include "type.hpp"
+#include "../type.hpp"
 
 #include <tao/pegtl.hpp>
 
@@ -188,11 +188,11 @@ namespace semver
     static void apply(const Input& in, semver::syntax::range_set& result, internal::stacks& stacks)
     {
       if (!stacks.partial)
-        stacks.partial = std::make_unique< semver::syntax::simple >();
+        stacks.partial = std::unique_ptr< semver::syntax::simple >(new semver::syntax::simple());
 
       try
       { // parse a number
-        stacks.partial->major = std::make_unique<int>(std::stoi(in.string()));
+        stacks.partial->major = std::unique_ptr< int >(new int(std::stoi(in.string())));
       }
       catch (std::invalid_argument&)
       { // or as a wildcard
@@ -211,7 +211,7 @@ namespace semver
 
       try
       { // parse a number
-        stacks.partial->minor = std::make_unique<int>(std::stoi(in.string()));
+        stacks.partial->minor = std::unique_ptr< int >(new int(std::stoi(in.string())));
       }
       catch (std::invalid_argument&)
       { // or as a wildcard
@@ -230,7 +230,7 @@ namespace semver
 
       try
       { // parse a number
-        stacks.partial->patch = std::make_unique<int>(std::stoi(in.string()));
+        stacks.partial->patch = std::unique_ptr< int >(new int(std::stoi(in.string())));
       }
       catch (std::invalid_argument&)
       { // or as a wildcard
@@ -287,7 +287,7 @@ namespace semver
     {
       assert(!stacks.partial);
 
-      stacks.partial = std::make_unique< semver::syntax::simple >();
+      stacks.partial = std::unique_ptr< semver::syntax::simple >(new semver::syntax::simple());
       stacks.partial->cmp = syntax::comparator::lt;
     }
   };
@@ -300,7 +300,7 @@ namespace semver
     {
       assert(!stacks.partial);
 
-      stacks.partial = std::make_unique< semver::syntax::simple >();
+      stacks.partial = std::unique_ptr< semver::syntax::simple >(new semver::syntax::simple());
       stacks.partial->cmp = syntax::comparator::gt;
     }
   };
@@ -313,7 +313,7 @@ namespace semver
     {
       assert(!stacks.partial);
 
-      stacks.partial = std::make_unique< semver::syntax::simple >();
+      stacks.partial = std::unique_ptr< semver::syntax::simple >(new semver::syntax::simple());
       stacks.partial->cmp = syntax::comparator::gte;
     }
   };
@@ -326,7 +326,7 @@ namespace semver
     {
       assert(!stacks.partial);
 
-      stacks.partial = std::make_unique< semver::syntax::simple >();
+      stacks.partial = std::unique_ptr< semver::syntax::simple >(new semver::syntax::simple());
       stacks.partial->cmp = syntax::comparator::lte;
     }
   };
@@ -339,7 +339,7 @@ namespace semver
     {
       assert(!stacks.partial);
 
-      stacks.partial = std::make_unique< semver::syntax::simple >();
+      stacks.partial = std::unique_ptr< semver::syntax::simple >(new semver::syntax::simple());
       stacks.partial->cmp = syntax::comparator::eq;
     }
   };
@@ -429,7 +429,7 @@ namespace semver
       result.swap(stacks.stack_range);
 
       // stack shall be cleared after a successful parse
-      assert (!stacks.partial &&
+      assert(!stacks.partial &&
         stacks.stack_partial.empty() &&
         stacks.stack_primitive.empty() &&
         stacks.stack_simple.empty() &&
@@ -439,7 +439,7 @@ namespace semver
 
   // ------------------ Trigger PEGTL parser function ------------------------------ //
 
-  semver::syntax::range_set peg_parse(const std::string input)
+  semver::syntax::range_set peg_parser(const std::string input)
   {
     namespace pegtl = tao::TAO_PEGTL_NAMESPACE;
     try
