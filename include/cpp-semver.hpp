@@ -2,12 +2,12 @@
 #define CPP_SEMVER_HPP
 
 #include "type.hpp"
+#include "parser/parser.hpp"
 
 #ifdef USE_PEGTL
 #include "parser/peg.hpp" // parsing with PETGTL
 #define RUN_PARSER peg_parser
 #else
-#include "parser/parser.hpp" // parsing with default parser
 #define RUN_PARSER default_parser
 #endif
 
@@ -328,6 +328,17 @@ namespace semver
     {
       return intersects(parse(rs1), parse(rs2));
     }
+
+    /** parse or cast as a syntax::simple if possible */
+    syntax::simple as_simple(const std::string& s)
+    {
+      syntax::range_set parsed = parse(s);
+
+      if (!parsed.empty() && !parsed.at(0).empty())
+        return std::move(parsed.at(0).at(0));
+
+      return{};
+    }
   }
 
 
@@ -470,6 +481,37 @@ namespace semver
     {
       return false;
     }
+  }
+
+  /** Return the major version number. */
+  int major(const std::string& version)
+  {
+    const auto& major = detail::as_simple(version).major;
+    return major ? *major : 0;
+  }
+
+  /** Return the minor version number. */
+  int minor(const std::string& version)
+  {
+    const auto& minor = detail::as_simple(version).minor;
+    return minor ? *minor : 0;
+  }
+
+  /** Return the patch version number. */
+  int patch(const std::string& version)
+  {
+    const auto& patch = detail::as_simple(version).patch;
+    return patch ? *patch : 0;
+  }
+
+  /** Returns an array of prerelease components. */
+  std::vector<std::string> prerelease(const std::string& version)
+  {
+    const auto& pre = detail::as_simple(version).pre;
+    if (pre.empty())
+      return {};
+
+    return split(pre, ".");
   }
 
 }

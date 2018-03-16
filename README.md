@@ -9,13 +9,15 @@
 
 ### API
 
-   * ```semver::valid( v )```: Return true if the given version or range is syntatically and semantically valid.
-   * ```semver::intersects( range1, range2="*" )```: Return true if the given version ranges or comparators intersect.
-   * ```semver::satisfies( version, range )```: Return true if the version satisfies the range.
+   * ```semver::valid( v )```: return true if the given version or range is syntatically and semantically valid.
+   * ```semver::intersects( range1, range2="*" )```: return true if the given version ranges or comparators intersect.
+   * ```semver::satisfies( version, range )```: return true if the version satisfies the range.
    * ```semver::gt( v1, v2 )```, ```semver::gte( v1, v2 )```,
      ```semver::lt( v1, v2 )```, ```semver::lte( v1, v2 )```,
      ```semver::eq( v1, v2 )```, ```semver::neq( v1, v2 )```,
      ```semver::gtr( version, range )```, ```semver::ltr( version, range )```: various comparators.
+   * ```semver::prerelease( version )```, ```semver::major( version )```,
+     ```semver::minor( version )```, ```semver::patch( version )```: get version parts if possible.
 
 ### Usage & Demo
 
