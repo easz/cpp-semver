@@ -5,11 +5,11 @@
  * header-only C++11
  * implements semver string parsing
  * implements significant features from [npm semver](https://docs.npmjs.com/misc/semver)
- * opional to use [PEGTL parser](https://github.com/taocpp/PEGTL)
+ * optional to use [PEGTL parser](https://github.com/taocpp/PEGTL)
 
-### API
+### API handling string representation
 
-   * ```semver::valid( v )```: return true if the given version or range is syntatically and semantically valid.
+   * ```semver::valid( v )```: return true if the given version or range is syntactically and semantically valid.
    * ```semver::intersects( range1, range2="*" )```: return true if the given version ranges or comparators intersect.
    * ```semver::satisfies( version, range )```: return true if the version satisfies the range.
    * ```semver::gt( v1, v2 )```, ```semver::gte( v1, v2 )```,
