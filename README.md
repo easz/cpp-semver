@@ -52,9 +52,19 @@ int main()
   return 0;
 }
 ```
-```
-> g++ -std=c++0x -Iinclude -IPEGTL/include example/demo.cpp
 
+Build with zero-dependency:
+```
+> g++ -std=c++0x -Iinclude example/demo.cpp
+```
+
+Or build with PEGTL:
+```
+> g++ -std=c++0x -D USE_PEGTL -Iinclude -IPEGTL/include example/demo.cpp
+```
+
+The result:
+```
 > ./a.out
 "1.0.0 || 1.5 - 3.0" and ">1.1 <2.0" are intersected.
 "<1.* >2.2" is not intersected.
