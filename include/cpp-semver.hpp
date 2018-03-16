@@ -3,13 +3,13 @@
 
 #include "type.hpp"
 
-//#ifdef USE_PEGTL
+#ifdef USE_PEGTL
 #include "parser/peg.hpp" // parsing with PETGTL
 #define RUN_PARSER peg_parser
-//#else
-//#include "parser/parser.hpp" // parsing with default parser
-//#define RUN_PARSER default_parser
-//#endif
+#else
+#include "parser/parser.hpp" // parsing with default parser
+#define RUN_PARSER default_parser
+#endif
 
 #include <string>
 #include <vector>
@@ -386,7 +386,7 @@ namespace semver
       for (const semantic::interval& interval_2 : interval_set_2)
         if (interval_1 > interval_2)
           return true;
-    
+
     return false;
   }
 

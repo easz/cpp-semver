@@ -52,6 +52,11 @@ const std::vector<
     { "2.4", "1.2.2", "0 - 1.1.0" }
   },
   {
+    "  1.2.3   -    2.3  ",
+    { "1.2.*", "2.3.9999" },
+    { "2.4", "1.2.2", "0 -   1.1.0  " }
+  },
+  {
     "1.2.3 - 2",
     { "1.2.3", "2.999.999" },
     { "3.0.0", "<1.2.3" }
@@ -197,7 +202,7 @@ const std::vector<
     { "1.2.3-beta.2", "1.2.*" }
   },
   {
-    " 0.0.1|| 1.2.*||2.3.4 ||3.4.5|| 7.8.9 ",
+    "  0.0.1||  1.2.*  ||2.3.4  ||3.4.5|| 7.8.9 ",
     { "1.2.9", "7.8.9" },
     { "1.1.*" }
   },
@@ -326,6 +331,16 @@ const std::vector<
     {  },
     { "*" }
   },
+  {
+    "",
+    { "1.2.3" },
+    {}
+  },
+  {
+    "1.1.1-pre--.--.--.000",
+    { },
+    { }
+  }
 };
 
 const std::vector<std::string> intersected_comp
@@ -340,13 +355,13 @@ const std::vector<std::string> not_intersected_comp
 
 void run_test()
 {
-  for (const auto& input : intersected_comp)
+  for (const std::string& input : intersected_comp)
   {
     std::cout << "[Test] intersects( \"" << input << "\" )" << std::endl;
     TEST_ASSERT(semver::intersects(input));
   }
-  
-  for (const auto& input : not_intersected_comp)
+
+  for (const std::string& input : not_intersected_comp)
   {
     std::cout << "[Test] !intersects( \"" << input << "\" )" << std::endl;
     TEST_ASSERT(!semver::intersects(input));

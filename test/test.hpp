@@ -38,7 +38,7 @@ void run_test();
 
 int main()
 {
-  
+
   std::cout << "[Test Suite] " << __FILE__ << std::endl;
   std::cout << std::endl;
 

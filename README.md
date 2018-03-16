@@ -4,9 +4,9 @@
 
  * header-only C++11
  * implements semver string parsing
- * implements significant features from [npm semver](https://docs.npmjs.com/misc/semver) 
- * uses [PEGTL parser](https://github.com/taocpp/PEGTL)
- 
+ * implements significant features from [npm semver](https://docs.npmjs.com/misc/semver)
+ * opional to use [PEGTL parser](https://github.com/taocpp/PEGTL)
+
 ### API
 
    * ```semver::valid( v )```: Return true if the given version or range is syntatically and semantically valid.
@@ -54,7 +54,7 @@ int main()
 ```
 ```
 > g++ -std=c++0x -Iinclude -IPEGTL/include example/demo.cpp
-   
+
 > ./a.out
 "1.0.0 || 1.5 - 3.0" and ">1.1 <2.0" are intersected.
 "<1.* >2.2" is not intersected.

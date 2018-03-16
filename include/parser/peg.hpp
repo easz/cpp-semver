@@ -52,7 +52,7 @@ namespace semver
 
   // xr ( '.' xr ( '.' xr qualifier ? )? )?
   // XXX: accepting leading optional 'v'
-  struct partial : p::seq< p::opt< p::one<'v'> >,
+  struct partial : p::seq< p::opt< p::one<'v', 'V'> >,
                            partial_major,
                            p::opt< p::one<'.'>,
                                    partial_minor,
@@ -129,11 +129,11 @@ namespace semver
     /// internal stack buffer used during parsing
     struct stacks
     {
-      std::unique_ptr< semver::syntax::simple >   partial;
-      std::vector< semver::syntax::simple >       stack_partial;
-      std::vector< semver::syntax::simple >       stack_primitive;
-      std::vector< semver::syntax::simple >       stack_simple;
-      std::vector< semver::syntax::range  >       stack_range;
+      std::unique_ptr< syntax::simple >   partial;
+      std::vector< syntax::simple >       stack_partial;
+      std::vector< syntax::simple >       stack_primitive;
+      std::vector< syntax::simple >       stack_simple;
+      std::vector< syntax::range  >       stack_range;
     };
 
   }
@@ -147,7 +147,7 @@ namespace semver
   struct action< pre >
   {
     template< typename Input >
-    static void apply(const Input& in, semver::syntax::range_set& result, internal::stacks& stacks)
+    static void apply(const Input& in, syntax::range_set& result, internal::stacks& stacks)
     {
       assert(stacks.partial != nullptr);
 
@@ -159,7 +159,7 @@ namespace semver
   struct action< build >
   {
     template< typename Input >
-    static void apply(const Input& in, semver::syntax::range_set& result, internal::stacks& stacks)
+    static void apply(const Input& in, syntax::range_set& result, internal::stacks& stacks)
     {
       assert(stacks.partial != nullptr);
 
@@ -171,7 +171,7 @@ namespace semver
   struct action< partial >
   {
     template< typename Input >
-    static void apply(const Input& in, semver::syntax::range_set& result, internal::stacks& stacks)
+    static void apply(const Input& in, syntax::range_set& result, internal::stacks& stacks)
     {
       assert(stacks.partial != nullptr);
 
@@ -185,10 +185,10 @@ namespace semver
   struct action< partial_major >
   {
     template< typename Input >
-    static void apply(const Input& in, semver::syntax::range_set& result, internal::stacks& stacks)
+    static void apply(const Input& in, syntax::range_set& result, internal::stacks& stacks)
     {
       if (!stacks.partial)
-        stacks.partial = std::unique_ptr< semver::syntax::simple >(new semver::syntax::simple());
+        stacks.partial = std::unique_ptr< syntax::simple >(new syntax::simple());
 
       try
       { // parse a number
@@ -205,7 +205,7 @@ namespace semver
   struct action< partial_minor >
   {
     template< typename Input >
-    static void apply(const Input& in, semver::syntax::range_set& result, internal::stacks& stacks)
+    static void apply(const Input& in, syntax::range_set& result, internal::stacks& stacks)
     {
       assert(stacks.partial != nullptr);
 
@@ -224,7 +224,7 @@ namespace semver
   struct action< partial_patch >
   {
     template< typename Input >
-    static void apply(const Input& in, semver::syntax::range_set& result, internal::stacks& stacks)
+    static void apply(const Input& in, syntax::range_set& result, internal::stacks& stacks)
     {
       assert(stacks.partial != nullptr);
 
@@ -243,7 +243,7 @@ namespace semver
   struct action< tilde >
   {
     template< typename Input >
-    static void apply(const Input& in, semver::syntax::range_set& result, internal::stacks& stacks)
+    static void apply(const Input& in, syntax::range_set& result, internal::stacks& stacks)
     {
       assert(!stacks.stack_partial.empty());
 
@@ -256,7 +256,7 @@ namespace semver
   struct action< caret >
   {
     template< typename Input >
-    static void apply(const Input& in, semver::syntax::range_set& result, internal::stacks& stacks)
+    static void apply(const Input& in, syntax::range_set& result, internal::stacks& stacks)
     {
       assert(!stacks.stack_partial.empty());
 
@@ -269,7 +269,7 @@ namespace semver
   struct action< primitive >
   {
     template< typename Input >
-    static void apply(const Input& in, semver::syntax::range_set& result, internal::stacks& stacks)
+    static void apply(const Input& in, syntax::range_set& result, internal::stacks& stacks)
     {
       assert(!stacks.stack_partial.empty());
 
@@ -283,11 +283,11 @@ namespace semver
   struct action< primitive_op_lt >
   {
     template< typename Input >
-    static void apply(const Input& in, semver::syntax::range_set& result, internal::stacks& stacks)
+    static void apply(const Input& in, syntax::range_set& result, internal::stacks& stacks)
     {
       assert(!stacks.partial);
 
-      stacks.partial = std::unique_ptr< semver::syntax::simple >(new semver::syntax::simple());
+      stacks.partial = std::unique_ptr< syntax::simple >(new syntax::simple());
       stacks.partial->cmp = syntax::comparator::lt;
     }
   };
@@ -296,11 +296,11 @@ namespace semver
   struct action< primitive_op_gt >
   {
     template< typename Input >
-    static void apply(const Input& in, semver::syntax::range_set& result, internal::stacks& stacks)
+    static void apply(const Input& in, syntax::range_set& result, internal::stacks& stacks)
     {
       assert(!stacks.partial);
 
-      stacks.partial = std::unique_ptr< semver::syntax::simple >(new semver::syntax::simple());
+      stacks.partial = std::unique_ptr< syntax::simple >(new syntax::simple());
       stacks.partial->cmp = syntax::comparator::gt;
     }
   };
@@ -309,11 +309,11 @@ namespace semver
   struct action< primitive_op_gte >
   {
     template< typename Input >
-    static void apply(const Input& in, semver::syntax::range_set& result, internal::stacks& stacks)
+    static void apply(const Input& in, syntax::range_set& result, internal::stacks& stacks)
     {
       assert(!stacks.partial);
 
-      stacks.partial = std::unique_ptr< semver::syntax::simple >(new semver::syntax::simple());
+      stacks.partial = std::unique_ptr< syntax::simple >(new syntax::simple());
       stacks.partial->cmp = syntax::comparator::gte;
     }
   };
@@ -322,11 +322,11 @@ namespace semver
   struct action< primitive_op_lte >
   {
     template< typename Input >
-    static void apply(const Input& in, semver::syntax::range_set& result, internal::stacks& stacks)
+    static void apply(const Input& in, syntax::range_set& result, internal::stacks& stacks)
     {
       assert(!stacks.partial);
 
-      stacks.partial = std::unique_ptr< semver::syntax::simple >(new semver::syntax::simple());
+      stacks.partial = std::unique_ptr< syntax::simple >(new syntax::simple());
       stacks.partial->cmp = syntax::comparator::lte;
     }
   };
@@ -335,11 +335,11 @@ namespace semver
   struct action< primitive_op_eq >
   {
     template< typename Input >
-    static void apply(const Input& in, semver::syntax::range_set& result, internal::stacks& stacks)
+    static void apply(const Input& in, syntax::range_set& result, internal::stacks& stacks)
     {
       assert(!stacks.partial);
 
-      stacks.partial = std::unique_ptr< semver::syntax::simple >(new semver::syntax::simple());
+      stacks.partial = std::unique_ptr< syntax::simple >(new syntax::simple());
       stacks.partial->cmp = syntax::comparator::eq;
     }
   };
@@ -348,7 +348,7 @@ namespace semver
   struct action< simple >
   {
     template< typename Input >
-    static void apply(const Input& in, semver::syntax::range_set& result, internal::stacks& stacks)
+    static void apply(const Input& in, syntax::range_set& result, internal::stacks& stacks)
     {
       if (!stacks.stack_primitive.empty())
       {
@@ -373,21 +373,21 @@ namespace semver
   struct action< hyphen >
   {
     template< typename Input >
-    static void apply(const Input& in, semver::syntax::range_set& result, internal::stacks& stacks)
+    static void apply(const Input& in, syntax::range_set& result, internal::stacks& stacks)
     {
       assert(stacks.stack_partial.size() >= 2);
 
       // reduce 2 'partial's to 1 'hyphon'
-      auto to = std::move(stacks.stack_partial.back());
+      syntax::simple to = std::move(stacks.stack_partial.back());
       stacks.stack_partial.pop_back();
-      auto from = std::move(stacks.stack_partial.back());
+      syntax::simple from = std::move(stacks.stack_partial.back());
       stacks.stack_partial.pop_back();
 
       // translate hyphon to a range set
       from.cmp = syntax::comparator::gte;
       to.cmp = syntax::comparator::lte;
 
-      semver::syntax::range hyphon;
+      syntax::range hyphon;
       hyphon.emplace_back(std::move(from));
       hyphon.emplace_back(std::move(to));
 
@@ -399,12 +399,12 @@ namespace semver
   struct action< range >
   {
     template< typename Input >
-    static void apply(const Input& in, semver::syntax::range_set& result, internal::stacks& stacks)
+    static void apply(const Input& in, syntax::range_set& result, internal::stacks& stacks)
     {
       if (!stacks.stack_simple.empty())
       {
         // reduce all 'simple's to 1 'range'
-        semver::syntax::range simple_set;
+        syntax::range simple_set;
         simple_set.swap(stacks.stack_simple);
         // imply stacks.stack_simple.clear();
         stacks.stack_range.emplace_back(std::move(simple_set));
@@ -412,7 +412,7 @@ namespace semver
       else if (in.string().find_first_not_of(" \t\r\n") == std::string::npos)
       {
         // the input may be a blank string which is allowed as an implcit *.*.* range
-        semver::syntax::range implicit_set;
+        syntax::range implicit_set;
         implicit_set.emplace_back(syntax::simple());
         stacks.stack_range.emplace_back(std::move(implicit_set));
       }
@@ -423,7 +423,7 @@ namespace semver
   struct action< range_set >
   {
     template< typename Input >
-    static void apply(const Input& in, semver::syntax::range_set& result, internal::stacks& stacks)
+    static void apply(const Input& in, syntax::range_set& result, internal::stacks& stacks)
     {
       // assign result
       result.swap(stacks.stack_range);
@@ -439,15 +439,15 @@ namespace semver
 
   // ------------------ Trigger PEGTL parser function ------------------------------ //
 
-  semver::syntax::range_set peg_parser(const std::string input)
+  syntax::range_set peg_parser(const std::string input)
   {
     namespace pegtl = tao::TAO_PEGTL_NAMESPACE;
     try
     {
-      semver::syntax::range_set result;
+      syntax::range_set result;
       internal::stacks stacks;
       pegtl::string_input<> in(input, "input string");
-      pegtl::parse< semver::range_set, semver::action >(in, result, stacks);
+      pegtl::parse< range_set, action >(in, result, stacks);
       return result;
     }
     catch (pegtl::parse_error const&)
