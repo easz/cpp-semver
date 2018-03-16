@@ -106,12 +106,17 @@ namespace semver
 
   std::string parse_part(const std::string& input)
   {
-    // part  ::= nr | [-0-9A-Za-z]+
+    // part  ::=
 
-    if (input.find_first_not_of(any_number) == std::string::npos)
+    if (input.empty() || any_number.find(input.at(0)) != std::string::npos)
+    { //         nr |
       parse_nr(input);
+    }
     else if (input.find_first_not_of("-" + any_number + any_alphabat) != std::string::npos)
+    {
+      //         [-0-9A-Za-z]+
       throw semver_error("unexpected character in part: '" + input + "'");
+    }
 
     return input;
   }
@@ -271,7 +276,7 @@ namespace semver
     return result;
   }
 
-  syntax::range_set default_parser(const std::string input)
+  syntax::range_set parser(const std::string input)
   {
     return parse_range_set(input);
   }

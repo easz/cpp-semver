@@ -19,6 +19,7 @@ const std::vector<std::string> is_not_valid
   ">2 <1",
   "1.2.3-pre...",
   "1.2.3-pre.01",
+  "1.2.3-pre.1-",
   "1.2-pre",
   "1.2.3-",
   "1.2.3+",

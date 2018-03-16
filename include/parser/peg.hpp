@@ -8,8 +8,10 @@
 #include <memory>
 #include <cassert>
 
-namespace semver
+namespace peg
 {
+  using namespace semver;
+
   // ------------------ Defining grammar with PEGTL ------------------------------ //
 
   namespace p = tao::TAO_PEGTL_NAMESPACE;
@@ -52,7 +54,7 @@ namespace semver
 
   // xr ( '.' xr ( '.' xr qualifier ? )? )?
   // XXX: accepting leading optional 'v'
-  struct partial : p::seq< p::opt< p::one<'v', 'V'> >,
+  struct partial : p::seq< p::opt< p::one<'v','V'> >,
                            partial_major,
                            p::opt< p::one<'.'>,
                                    partial_minor,
@@ -439,7 +441,7 @@ namespace semver
 
   // ------------------ Trigger PEGTL parser function ------------------------------ //
 
-  syntax::range_set peg_parser(const std::string input)
+  syntax::range_set parser(const std::string input)
   {
     namespace pegtl = tao::TAO_PEGTL_NAMESPACE;
     try
