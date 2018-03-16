@@ -371,6 +371,12 @@ namespace semver
     return false;
   }
 
+  /** v1 != v2 */
+  bool neq(const std::string& v1, const std::string& v2)
+  {
+    return !eq(v1, v2);
+  }
+
   /** v1 > v2 */
   bool gt(const std::string& v1, const std::string& v2)
   {

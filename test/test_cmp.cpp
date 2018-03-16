@@ -46,6 +46,10 @@ void run_test()
     TEST_ASSERT(!semver::eq(v1, v2));
     std::cout << "[Test] !eq( \"" << v2 << "\", \"" << v1 << "\" )" << std::endl;
     TEST_ASSERT(!semver::eq(v2, v1));
+    std::cout << "[Test] neq( \"" << v1 << "\", \"" << v2 << "\" )" << std::endl;
+    TEST_ASSERT(semver::neq(v1, v2));
+    std::cout << "[Test] neq( \"" << v2 << "\", \"" << v1 << "\" )" << std::endl;
+    TEST_ASSERT(semver::neq(v2, v1));
 
     std::cout << "[Test] !lt( \"" << v1 << "\", \"" << v2 << "\" )" << std::endl;
     TEST_ASSERT(!semver::lt(v1, v2));
@@ -69,6 +73,8 @@ void run_test()
 
     std::cout << "[Test] eq( \"" << v1 << "\", \"" << v2 << "\" )" << std::endl;
     TEST_ASSERT(semver::eq(v1, v2));
+    std::cout << "[Test] !neq( \"" << v1 << "\", \"" << v2 << "\" )" << std::endl;
+    TEST_ASSERT(!semver::neq(v1, v2));
   }
 
   for (const auto& tpl : test_data_gtr)

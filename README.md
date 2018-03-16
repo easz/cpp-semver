@@ -14,8 +14,8 @@
    * ```semver::satisfies( version, range )```: Return true if the version satisfies the range.
    * ```semver::gt( v1, v2 )```, ```semver::gte( v1, v2 )```,
      ```semver::lt( v1, v2 )```, ```semver::lte( v1, v2 )```,
-     ```semver::eq( v1, v2 )```, ```semver::gtr( version, range )```,
-     ```semver::ltr( version, range )```: various comparators.
+     ```semver::eq( v1, v2 )```, ```semver::neq( v1, v2 )```,
+     ```semver::gtr( version, range )```, ```semver::ltr( version, range )```: various comparators.
 
 ### Usage & Demo
 
