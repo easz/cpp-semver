@@ -157,10 +157,12 @@ namespace semver
         result.build = parse_parts(input.substr(found_build + 1));
 
       if (found_pre != std::string::npos)
+      {
         if (found_build != std::string::npos)
           result.pre = parse_parts(input.substr(found_pre + 1, found_build - found_pre - 1));
         else
           result.pre = parse_parts(input.substr(found_pre + 1));
+      }
     }
 
     {
