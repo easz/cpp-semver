@@ -3,7 +3,6 @@
 
 #include <string>
 #include <vector>
-#include <memory>
 
 namespace semver
 {
@@ -44,13 +43,20 @@ namespace semver
       eq, lt, lte, gt, gte, tilde, caret
     };
 
+    /// default represents '*'
+    struct xnumber
+    {
+      bool is_wildcard = true;
+      int value = 0;
+    };
+
     /// represents any type of 'simple', 'primitive', 'partial', 'tilde' or 'caret' from the grammar.
     /// The default value represents *.*.*
     struct simple
     {
-      std::unique_ptr<int> major;
-      std::unique_ptr<int> minor;
-      std::unique_ptr<int> patch;
+      xnumber major;
+      xnumber minor;
+      xnumber patch;
 
       std::string pre = "";
       std::string build = "";

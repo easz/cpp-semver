@@ -34,9 +34,9 @@ namespace semver
 
       semantic::boundary b; // associate boundary from input x.y.z-pre
                             // replace * with 0
-      b.major = (input.major ? *input.major : 0);
-      b.minor = (input.minor ? *input.minor : 0);
-      b.patch = (input.patch ? *input.patch : 0);
+      b.major = (!input.major.is_wildcard ? input.major.value : 0);
+      b.minor = (!input.minor.is_wildcard ? input.minor.value : 0);
+      b.patch = (!input.patch.is_wildcard ? input.patch.value : 0);
       b.pre = input.pre;
 
       switch (input.cmp)
@@ -46,8 +46,10 @@ namespace semver
         result.to_inclusive = false;
         result.to = b;
 
-        if (!input.major || !input.minor || !input.patch)  // <x.*-pre   := [min, x.0.0)
-          result.to.pre = "";                              // <x.y.*-pre := [min, x,y.0)
+        if (input.major.is_wildcard ||
+            input.minor.is_wildcard ||
+            input.patch.is_wildcard)      // <x.*-pre   := [min, x.0.0)
+          result.to.pre = "";             // <x.y.*-pre := [min, x,y.0)
 
         break;
 
@@ -55,22 +57,24 @@ namespace semver
 
         result.to = b;
 
-        if (!input.major || !input.minor || !input.patch)  // <=x.*-pre   := [min, 'x+1'.0.0)
-        {                                                  // <=x.y.*-pre := [min, x,'y+1'.0)
+        if (input.major.is_wildcard ||
+            input.minor.is_wildcard ||
+            input.patch.is_wildcard)              // <=x.*-pre   := [min, 'x+1'.0.0)
+        {                                         // <=x.y.*-pre := [min, x,'y+1'.0)
           result.to_inclusive = false;
           result.to.pre = "";
         }
 
-        if (!input.major)              // <=* := [min, max]
+        if (input.major.is_wildcard)              // <=* := [min, max]
         {
           result = semantic::interval();
         }
-        else if (!input.minor)             // <=x.*-pre := [min, 'x+1'.0.0)
+        else if (input.minor.is_wildcard)         // <=x.*-pre := [min, 'x+1'.0.0)
         {
           result.to.major += 1;
           result.to.patch = 0;
         }
-        else if (!input.patch)             // <=x.y.*-pre := [min, x,'y+1'.0)
+        else if (input.patch.is_wildcard)        // <=x.y.*-pre := [min, x,'y+1'.0)
         {
           result.to.minor += 1;
         }
@@ -81,22 +85,24 @@ namespace semver
         result.from_inclusive = false;
         result.from = b;
 
-        if (!input.major || !input.minor || !input.patch)  // >x.*-pre   := ['x+1', max]
-        {                                                  // >x.y.*-pre := [x.'y+1', max]
+        if (input.major.is_wildcard ||
+            input.minor.is_wildcard ||
+            input.patch.is_wildcard)       // >x.*-pre   := ['x+1', max]
+        {                                  // >x.y.*-pre := [x.'y+1', max]
           result.from_inclusive = true;
           result.from.pre = "";
         }
 
-        if (!input.major)
+        if (input.major.is_wildcard)
         {
           result.from = semantic::boundary::max(); // invalid set
         }
-        else if (!input.minor)             // >x.*-pre := ['x+1'.0.0, max]
+        else if (input.minor.is_wildcard)             // >x.*-pre := ['x+1'.0.0, max]
         {
           result.from.major += 1;
           result.from.patch = 0;
         }
-        else if (!input.patch)             // >x.y.*-pre := [x,'y+1'.0, max]
+        else if (input.patch.is_wildcard)             // >x.y.*-pre := [x,'y+1'.0, max]
         {
           result.from.minor += 1;
         }
@@ -107,8 +113,10 @@ namespace semver
 
         result.from = b;
 
-        if (!input.major || !input.minor || !input.patch)  // >=x.*-pre   := [x.0.0, max]
-          result.from.pre = "";                            // >=x.y.*-pre := [x.y.0, max]
+        if (input.major.is_wildcard ||
+            input.minor.is_wildcard ||
+            input.patch.is_wildcard)     // >=x.*-pre   := [x.0.0, max]
+          result.from.pre = "";          // >=x.y.*-pre := [x.y.0, max]
 
         break;
 
@@ -117,30 +125,32 @@ namespace semver
         result.from = b;
         result.to = b;
 
-        if (!input.major || !input.minor || !input.patch)
+        if (input.major.is_wildcard ||
+            input.minor.is_wildcard ||
+            input.patch.is_wildcard)
           result.from.pre = "";
 
         result.to_inclusive = false;
         result.to.pre = "";
 
-        if (!input.major)              // ^* := [min, max]
+        if (input.major.is_wildcard)              // ^* := [min, max]
         {
           result = semantic::interval();
         }
-        else if (*input.major != 0 ||  // ^x.y.z-pre := [x.y.z-pre, 'x+1'.0.0)
-          !input.minor)         // ^x.y       := [x.y.0, 'x+1'.0.0)
+        else if (input.major.value != 0 ||  // ^x.y.z-pre := [x.y.z-pre, 'x+1'.0.0)
+          input.minor.is_wildcard)     // ^x.y       := [x.y.0, 'x+1'.0.0)
         {                              // ^x         := [x.0.0, 'x+1'.0.0)
           result.to.major += 1;        // ^0         := [0.0.0, 1.0.0)
           result.to.minor = 0;
           result.to.patch = 0;
         }
-        else if (*input.minor != 0 || // ^0.y.z := [0.y.z, 0.'y+1'.z)
-          !input.patch)        // ^0.y   := [0.y.0, 0.'y+1'.0)
+        else if (input.minor.value != 0 || // ^0.y.z := [0.y.z, 0.'y+1'.z)
+          input.patch.is_wildcard)        // ^0.y   := [0.y.0, 0.'y+1'.0)
         {
           result.to.minor += 1;
           result.to.patch = 0;
         }
-        else if (*input.patch != 0)
+        else if (input.patch.value != 0)
         {
           result.to.patch += 1; // ^0.0.z := [0.0.z, 0.0.'z+1')
         }
@@ -152,17 +162,19 @@ namespace semver
         result.from = b;
         result.to = b;
 
-        if (!input.major || !input.minor || !input.patch)
+        if (input.major.is_wildcard ||
+            input.minor.is_wildcard ||
+            input.patch.is_wildcard)
           result.from.pre = "";
 
         result.to_inclusive = false;
         result.to.pre = "";
 
-        if (!input.major)              // ~* := [min, max]
+        if (input.major.is_wildcard)              // ~* := [min, max]
         {
           result = semantic::interval();
         }
-        else if (!input.minor)         // ~x-pre := [x.0.0, 'x+1'.0.0)
+        else if (input.minor.is_wildcard)         // ~x-pre := [x.0.0, 'x+1'.0.0)
         {
           result.from.pre = "";
 
@@ -184,26 +196,28 @@ namespace semver
         result.from = b;                   // x.y.z := [x.y.z, x.y.z]
         result.to = b;
 
-        if (!input.major || !input.minor || !input.patch)  // =x.*-pre   := [x.0.0, 'x+1'.0.0)
-        {                                                  // =x.y.*-pre := [x.y.0, x.'y+1'.0)
+        if (input.major.is_wildcard ||
+            input.minor.is_wildcard ||
+            input.patch.is_wildcard)       // =x.*-pre   := [x.0.0, 'x+1'.0.0)
+        {                                  // =x.y.*-pre := [x.y.0, x.'y+1'.0)
           result.from.pre = "";
 
           result.to_inclusive = false;
           result.to.pre = "";
         }
 
-        if (!input.major)                  // * := [min, max]
+        if (input.major.is_wildcard)                  // * := [min, max]
         {
           result = semantic::interval();
         }
-        else if (!input.minor)             // x := [x.0.0, 'x+1'.0.0)
+        else if (input.minor.is_wildcard)             // x := [x.0.0, 'x+1'.0.0)
         {
           result.from.patch = 0;
 
           result.to.major += 1;
           result.to.patch = 0;
         }
-        else if (!input.patch)              // x.y   := [x.y.0, x.'y+1'.0)
+        else if (input.patch.is_wildcard)              // x.y   := [x.y.0, x.'y+1'.0)
         {
           result.to.minor += 1;
         }
@@ -488,21 +502,21 @@ namespace semver
   int major(const std::string& version)
   {
     const auto& major = detail::as_simple(version).major;
-    return major ? *major : 0;
+    return !major.is_wildcard ? major.value : 0;
   }
 
   /** Return the minor version number. */
   int minor(const std::string& version)
   {
     const auto& minor = detail::as_simple(version).minor;
-    return minor ? *minor : 0;
+    return !minor.is_wildcard ? minor.value : 0;
   }
 
   /** Return the patch version number. */
   int patch(const std::string& version)
   {
     const auto& patch = detail::as_simple(version).patch;
-    return patch ? *patch : 0;
+    return !patch.is_wildcard ? patch.value : 0;
   }
 
   /** Returns an array of prerelease components. */

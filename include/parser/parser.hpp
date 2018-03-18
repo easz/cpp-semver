@@ -6,7 +6,6 @@
 
 #include <vector>
 #include <string>
-#include <memory>
 
 namespace semver
 {
@@ -33,15 +32,18 @@ namespace semver
     }
   }
 
-  std::unique_ptr< int > parse_xr(const std::string& input)
+  syntax::xnumber parse_xr(const std::string& input)
   {
     // xr ::=
     //        'x' | 'X' | '*' |
     if (input == "x" || input == "X" || input == "*")
-      return nullptr;
+      return {};
 
     //        nr
-    return std::unique_ptr< int >(new int(parse_nr(input)));
+    syntax::xnumber nr;
+    nr.is_wildcard = false;
+    nr.value = parse_nr(input);
+    return nr;
   }
 
   std::string parse_part(const std::string& input)
@@ -123,12 +125,12 @@ namespace semver
         // allow 'v' prefix
         std::string xr = xr_tokens.at(0);
         xr = (xr.find_first_of("vV") == 0) ? xr.substr(1) : xr;
-        result.major = std::move(parse_xr(xr));
+        result.major = parse_xr(xr);
       }
       if (xr_tokens.size() > 1)
-        result.minor = std::move(parse_xr(xr_tokens.at(1)));
+        result.minor = parse_xr(xr_tokens.at(1));
       if (xr_tokens.size() > 2)
-        result.patch = std::move(parse_xr(xr_tokens.at(2)));
+        result.patch = parse_xr(xr_tokens.at(2));
       if (xr_tokens.size() > 3)
         throw semver_error("invalid version: '" + xr_xr_xr + "'");
     }
@@ -183,8 +185,8 @@ namespace semver
       syntax::simple to = parse_partial(hyphen_tokens.at(1));
       from.cmp = syntax::comparator::gte;
       to.cmp = syntax::comparator::lte;
-      hyphen.emplace_back(std::move(from));
-      hyphen.emplace_back(std::move(to));
+      hyphen.emplace_back(from);
+      hyphen.emplace_back(to);
       return hyphen;
     }
     else if (input.find_first_not_of(any_space) != std::string::npos)
