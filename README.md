@@ -57,14 +57,14 @@ int main()
 
 Build with zero-dependency:
 ```
-> g++ -std=c++0x -Iinclude example/demo.cpp
+> g++ -std=c++11 -Iinclude example/demo.cpp
 ```
 
 Or build with PEGTL:
 
 ```
 > git submodule update --init --recursive
-> g++ -std=c++0x -D USE_PEGTL -Iinclude -IPEGTL/include example/demo.cpp
+> g++ -std=c++11 -D USE_PEGTL -Iinclude -IPEGTL/include example/demo.cpp
 ```
 
 The result:
