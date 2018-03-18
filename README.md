@@ -3,8 +3,8 @@
 ### Features
 
  * header-only C++11
- * implements semver string parsing
- * implements significant features from [npm semver](https://docs.npmjs.com/misc/semver)
+ * parses semver string
+ * inspired by [Semantic Versioning](https://semver.org/) and [NPM](https://docs.npmjs.com/misc/semver)
  * optional to use [PEGTL parser](https://github.com/taocpp/PEGTL)
 
 ### API handling string representation
@@ -61,7 +61,9 @@ Build with zero-dependency:
 ```
 
 Or build with PEGTL:
+
 ```
+> git submodule update --init --recursive
 > g++ -std=c++0x -D USE_PEGTL -Iinclude -IPEGTL/include example/demo.cpp
 ```
 
@@ -70,5 +72,4 @@ The result:
 > ./a.out
 "1.0.0 || 1.5 - 3.0" and ">1.1 <2.0" are intersected.
 "<1.* >2.2" is not intersected.
-
 ```

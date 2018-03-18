@@ -1,11 +1,15 @@
 #ifndef CPP_SEMVER_HPP
 #define CPP_SEMVER_HPP
 
-#include "type.hpp"
-#include "parser/parser.hpp"
+#include "base/type.hpp"
+#include "base/util.hpp"
 
 #ifdef USE_PEGTL
 #include "parser/peg.hpp" // PETGTL parser
+#define PARSER peg::parser
+#else
+#include "parser/parser.hpp"
+#define PARSER semver::parser
 #endif
 
 #include <string>
@@ -19,11 +23,7 @@ namespace semver
     /* parse version range in string into syntactical representation @c syntax::range_set */
     syntax::range_set parse(const std::string& input)
     {
-#ifdef USE_PEGTL
-      return peg::parser(input);
-#else
-      return parser(input);
-#endif
+      return PARSER(input);
     }
 
     /* parse syntactical representation @c syntax::simple and convert it to sementical representation @c semantic::interval */

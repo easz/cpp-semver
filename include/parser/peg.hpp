@@ -1,7 +1,7 @@
 #ifndef CPP_SEMVER_PEG_HPP
 #define CPP_SEMVER_PEG_HPP
 
-#include "../type.hpp"
+#include "../base/type.hpp"
 
 #include <tao/pegtl.hpp>
 

@@ -1,7 +1,6 @@
 #ifndef CPP_SEMVER_TYPE_HPP
 #define CPP_SEMVER_TYPE_HPP
 
-
 #include <string>
 #include <vector>
 #include <memory>
