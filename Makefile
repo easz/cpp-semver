@@ -1,4 +1,4 @@
-CXXFLAGS ?= -pedantic -Wall -Wextra -Wshadow -Werror -std=c++0x -Iinclude
+CXXFLAGS ?= -pedantic -Wall -Wextra -Wshadow -Werror -std=c++11 -Iinclude
 
 CXXFLAGS_USE_PEGL := -IPEGTL/include -D USE_PEGTL
 CXXFLAGS_NDEBUG := -D NDEBUG
@@ -57,19 +57,25 @@ help:
 .PHONY: .build_example
 .build_example: $(BIN_EXAMPLE)
 
-build/%: %.cpp
-	@mkdir -p $(@D)
-	$(CXX) $(CXXFLAGS) $< -o $@
-
 # run test
 .PHONY: test
 test: $(BIN_TEST)
-	@set -e; for T in $(BIN_TEST) ; do echo $$T ; $$T | tail -1 ; done
+	@set -e; for T in $(BIN_TEST) ; do echo $$T ; $$T > $$T.log ; tail -1 $$T.log ; done
 
 # clean build dir
 .PHONY: clean
 clean:
 	@rm -rf build
 
+build/%.d: %.cpp Makefile
+	@mkdir -p $(@D)
+	$(CXX) $(CXXFLAGS) -MM -MQ $@ $< -o $@
 
+build/%: %.cpp build/%.d
+	@mkdir -p $(@D)
+	$(CXX) $(CXXFLAGS) $< -o $@
 
+ifeq ($(findstring $(MAKECMDGOALS),clean),)
+-include $(DEP_TEST)
+-include $(DEP_EXAMPLE)
+endif

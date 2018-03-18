@@ -42,10 +42,17 @@ int main()
   std::cout << "[Test Suite] " << __FILE__ << std::endl;
   std::cout << std::endl;
 
-  run_test();
-
-  std::cout << std::endl;
-  std::cout << "[OK]" << std::endl;
+  try
+  {
+    run_test();
+    std::cout << std::endl;
+    std::cout << "[OK]" << std::endl;
+  }
+  catch (...)
+  {
+    std::cout << std::endl;
+    std::cout << "[FAILED]" << std::endl;
+  }
 
   return 0;
 }
