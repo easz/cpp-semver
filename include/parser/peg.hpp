@@ -149,7 +149,7 @@ namespace peg
   struct action< pre >
   {
     template< typename Input >
-    static void apply(const Input& in, syntax::range_set& result, internal::stacks& stacks)
+    static void apply(const Input& in, syntax::range_set&, internal::stacks& stacks)
     {
       assert(stacks.partial != nullptr);
 
@@ -161,7 +161,7 @@ namespace peg
   struct action< build >
   {
     template< typename Input >
-    static void apply(const Input& in, syntax::range_set& result, internal::stacks& stacks)
+    static void apply(const Input& in, syntax::range_set&, internal::stacks& stacks)
     {
       assert(stacks.partial != nullptr);
 
@@ -173,7 +173,7 @@ namespace peg
   struct action< partial >
   {
     template< typename Input >
-    static void apply(const Input& in, syntax::range_set& result, internal::stacks& stacks)
+    static void apply(const Input&, syntax::range_set&, internal::stacks& stacks)
     {
       assert(stacks.partial != nullptr);
 
@@ -187,18 +187,21 @@ namespace peg
   struct action< partial_major >
   {
     template< typename Input >
-    static void apply(const Input& in, syntax::range_set& result, internal::stacks& stacks)
+    static void apply(const Input& in, syntax::range_set&, internal::stacks& stacks)
     {
       if (!stacks.partial)
         stacks.partial = std::unique_ptr< syntax::simple >(new syntax::simple());
 
       try
       { // parse a number
-        stacks.partial->major = std::unique_ptr< int >(new int(std::stoi(in.string())));
+        syntax::xnumber x_nr;
+        x_nr.is_wildcard = false;
+        x_nr.value = std::stoi(in.string());
+        stacks.partial->major = x_nr;
       }
       catch (std::invalid_argument&)
       { // or as a wildcard
-        stacks.partial->major.reset();
+        stacks.partial->major = { };
       }
     }
   };
@@ -207,17 +210,20 @@ namespace peg
   struct action< partial_minor >
   {
     template< typename Input >
-    static void apply(const Input& in, syntax::range_set& result, internal::stacks& stacks)
+    static void apply(const Input& in, syntax::range_set&, internal::stacks& stacks)
     {
       assert(stacks.partial != nullptr);
 
       try
       { // parse a number
-        stacks.partial->minor = std::unique_ptr< int >(new int(std::stoi(in.string())));
+        syntax::xnumber x_nr;
+        x_nr.is_wildcard = false;
+        x_nr.value = std::stoi(in.string());
+        stacks.partial->minor = x_nr;
       }
       catch (std::invalid_argument&)
       { // or as a wildcard
-        stacks.partial->minor.reset();
+        stacks.partial->minor = { };
       }
     }
   };
@@ -226,17 +232,20 @@ namespace peg
   struct action< partial_patch >
   {
     template< typename Input >
-    static void apply(const Input& in, syntax::range_set& result, internal::stacks& stacks)
+    static void apply(const Input& in, syntax::range_set&, internal::stacks& stacks)
     {
       assert(stacks.partial != nullptr);
 
       try
       { // parse a number
-        stacks.partial->patch = std::unique_ptr< int >(new int(std::stoi(in.string())));
+        syntax::xnumber x_nr;
+        x_nr.is_wildcard = false;
+        x_nr.value = std::stoi(in.string());
+        stacks.partial->patch = x_nr;
       }
       catch (std::invalid_argument&)
       { // or as a wildcard
-        stacks.partial->patch.reset();
+        stacks.partial->patch = { };
       }
     }
   };
@@ -245,7 +254,7 @@ namespace peg
   struct action< tilde >
   {
     template< typename Input >
-    static void apply(const Input& in, syntax::range_set& result, internal::stacks& stacks)
+    static void apply(const Input&, syntax::range_set&, internal::stacks& stacks)
     {
       assert(!stacks.stack_partial.empty());
 
@@ -258,7 +267,7 @@ namespace peg
   struct action< caret >
   {
     template< typename Input >
-    static void apply(const Input& in, syntax::range_set& result, internal::stacks& stacks)
+    static void apply(const Input&, syntax::range_set&, internal::stacks& stacks)
     {
       assert(!stacks.stack_partial.empty());
 
@@ -271,7 +280,7 @@ namespace peg
   struct action< primitive >
   {
     template< typename Input >
-    static void apply(const Input& in, syntax::range_set& result, internal::stacks& stacks)
+    static void apply(const Input&, syntax::range_set&, internal::stacks& stacks)
     {
       assert(!stacks.stack_partial.empty());
 
@@ -285,7 +294,7 @@ namespace peg
   struct action< primitive_op_lt >
   {
     template< typename Input >
-    static void apply(const Input& in, syntax::range_set& result, internal::stacks& stacks)
+    static void apply(const Input&, syntax::range_set&, internal::stacks& stacks)
     {
       assert(!stacks.partial);
 
@@ -298,7 +307,7 @@ namespace peg
   struct action< primitive_op_gt >
   {
     template< typename Input >
-    static void apply(const Input& in, syntax::range_set& result, internal::stacks& stacks)
+    static void apply(const Input&, syntax::range_set&, internal::stacks& stacks)
     {
       assert(!stacks.partial);
 
@@ -311,7 +320,7 @@ namespace peg
   struct action< primitive_op_gte >
   {
     template< typename Input >
-    static void apply(const Input& in, syntax::range_set& result, internal::stacks& stacks)
+    static void apply(const Input&, syntax::range_set&, internal::stacks& stacks)
     {
       assert(!stacks.partial);
 
@@ -324,7 +333,7 @@ namespace peg
   struct action< primitive_op_lte >
   {
     template< typename Input >
-    static void apply(const Input& in, syntax::range_set& result, internal::stacks& stacks)
+    static void apply(const Input&, syntax::range_set&, internal::stacks& stacks)
     {
       assert(!stacks.partial);
 
@@ -337,7 +346,7 @@ namespace peg
   struct action< primitive_op_eq >
   {
     template< typename Input >
-    static void apply(const Input& in, syntax::range_set& result, internal::stacks& stacks)
+    static void apply(const Input&, syntax::range_set&, internal::stacks& stacks)
     {
       assert(!stacks.partial);
 
@@ -350,7 +359,7 @@ namespace peg
   struct action< simple >
   {
     template< typename Input >
-    static void apply(const Input& in, syntax::range_set& result, internal::stacks& stacks)
+    static void apply(const Input&, syntax::range_set&, internal::stacks& stacks)
     {
       if (!stacks.stack_primitive.empty())
       {
@@ -375,7 +384,7 @@ namespace peg
   struct action< hyphen >
   {
     template< typename Input >
-    static void apply(const Input& in, syntax::range_set& result, internal::stacks& stacks)
+    static void apply(const Input&, syntax::range_set&, internal::stacks& stacks)
     {
       assert(stacks.stack_partial.size() >= 2);
 
@@ -401,7 +410,7 @@ namespace peg
   struct action< range >
   {
     template< typename Input >
-    static void apply(const Input& in, syntax::range_set& result, internal::stacks& stacks)
+    static void apply(const Input& in, syntax::range_set&, internal::stacks& stacks)
     {
       if (!stacks.stack_simple.empty())
       {
@@ -425,7 +434,7 @@ namespace peg
   struct action< range_set >
   {
     template< typename Input >
-    static void apply(const Input& in, syntax::range_set& result, internal::stacks& stacks)
+    static void apply(const Input&, syntax::range_set& result, internal::stacks& stacks)
     {
       // assign result
       result.swap(stacks.stack_range);

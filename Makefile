@@ -1,7 +1,14 @@
-CXXFLAGS ?= -pedantic -Wall -Wextra -Wshadow -Werror -std=c++11 -Iinclude
+CXXFLAGS ?= -pedantic \
+            -Wall -Wextra -Wshadow -Werror \
+						-std=c++11 -Iinclude
 
-CXXFLAGS_USE_PEGL := -IPEGTL/include -D USE_PEGTL
-CXXFLAGS_NDEBUG := -D NDEBUG
+ifdef USE_PEGTL
+CXXFLAGS += -IPEGTL/include -D USE_PEGTL
+endif
+
+ifdef NDEBUG
+CXXFLAGS += -D NDEBUG
+endif
 
 HEADER := $(shell find include -name '*.hpp')
 
@@ -17,37 +24,27 @@ BIN_TEST := $(SRC_TEST:%.cpp=build/%)
 .PHONY: all
 all: .build_test .build_example
 
-# option
-.PHONY: use_pegtl
-use_pegtl: ;
-ifneq (,$(filter use_pegtl,$(MAKECMDGOALS)))
-CXXFLAGS += $(CXXFLAGS_USE_PEGL)
-endif
-
-# option
-.PHONY: ndebug
-ndebug: ;
-ifneq (,$(filter ndebug,$(MAKECMDGOALS)))
-CXXFLAGS += $(CXXFLAGS_NDEBUG)
-endif
-
 # help
 .PHONY: help
 help:
-	@echo ""
 	@echo "target:"
 	@echo "  all (default): build tests and examples"
 	@echo "  test : run tests"
 	@echo "  clean : clean everything"
 	@echo "  help : show help"
 	@echo ""
-	@echo "options:"
-	@echo "  use_pegtl : use PEGTL library"
-	@echo "  ndebug : None Debug mode"
+	@echo "options variable:"
+	@echo "  USE_PEGTL : use PEGTL library"
+	@echo "  NDEBUG : None Debug mode"
 	@echo ""
-	@echo "for example, build an run test with PEGTL :"
-	@echo "  > make use_pegtl test"
+	@echo "for example, build and run test with PEGTL :"
+	@echo "  > make USE_PEGTL=1 test"
 	@echo ""
+
+# clean build dir
+.PHONY: clean
+clean:
+	@rm -rf build
 
 # build test
 .PHONY: .build_test
@@ -62,12 +59,7 @@ help:
 test: $(BIN_TEST)
 	@set -e; for T in $(BIN_TEST) ; do echo $$T ; $$T > $$T.log ; tail -1 $$T.log ; done
 
-# clean build dir
-.PHONY: clean
-clean:
-	@rm -rf build
-
-build/%.d: %.cpp Makefile
+build/%.d: %.cpp
 	@mkdir -p $(@D)
 	$(CXX) $(CXXFLAGS) -MM -MQ $@ $< -o $@
 
