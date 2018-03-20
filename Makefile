@@ -16,19 +16,16 @@ endif
 HEADER := $(shell find include -name '*.hpp')
 
 SRC_EXAMPLE := $(shell find example -name '*.cpp')
-DEP_EXAMPLE := $(SRC_EXAMPLE:%.cpp=build/%.d)
 BIN_EXAMPLE := $(SRC_EXAMPLE:%.cpp=build/%)
 
 SRC_TEST := $(shell find test -name '*.cpp')
-DEP_TEST := $(SRC_TEST:%.cpp=build/%.d)
 BIN_TEST := $(SRC_TEST:%.cpp=build/%)
 
 # default
-.PHONY: all
 all: .build_test .build_example
+.PHONY: all
 
 # help
-.PHONY: help
 help:
 	@echo "targets:"
 	@echo "  all (default): build tests and examples"
@@ -43,34 +40,33 @@ help:
 	@echo "for example, build and run test with PEGTL :"
 	@echo "  > make USE_PEGTL=1 test"
 	@echo ""
+.PHONY: help
 
 # clean build dir
-.PHONY: clean
 clean:
 	@rm -rf build
+.PHONY: clean
 
 # build test
-.PHONY: .build_test
 .build_test: $(BIN_TEST)
+.PHONY: .build_test
 
 # build example
-.PHONY: .build_example
 .build_example: $(BIN_EXAMPLE)
+.PHONY: .build_example
 
 # run test
-.PHONY: test
-test: $(BIN_TEST)
+test: .build_test
+	@echo "Run tests..."
 	@set -e; for T in $(BIN_TEST) ; do echo $$T ; $$T > $$T.log ; tail -1 $$T.log ; done
+.PHONY: test
 
+# generates include-dependency
 build/%.d: %.cpp
 	@mkdir -p $(@D)
 	$(CXX) $(CXXFLAGS) -MM -MQ $@ $< -o $@
 
+# compile cpp
 build/%: %.cpp build/%.d
 	@mkdir -p $(@D)
 	$(CXX) $(CXXFLAGS) $< -o $@
-
-ifeq ($(findstring $(MAKECMDGOALS),clean),)
--include $(DEP_TEST)
--include $(DEP_EXAMPLE)
-endif
