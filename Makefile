@@ -1,27 +1,35 @@
 .SUFFIXES:
 .SECONDARY:
 
+BUILD := build
+
 CXXFLAGS ?= -pedantic \
             -Wall -Wextra -Wshadow -Werror \
 						-std=c++11 -Iinclude
 
-ifdef USE_PEGTL
-CXXFLAGS += -IPEGTL/include -D USE_PEGTL
-endif
-
 ifdef NDEBUG
 CXXFLAGS += -D NDEBUG
+BUILD := $(BUILD)/ndebug
+else
+BUILD := $(BUILD)/debug
+endif
+
+ifdef USE_PEGTL
+CXXFLAGS += -IPEGTL/include -D USE_PEGTL
+BUILD := $(BUILD)/use_pegtl
+else
+BUILD := $(BUILD)/no_pegtl
 endif
 
 HEADER := $(shell find include -name '*.hpp')
 
 SRC_EXAMPLE := $(shell find example -name '*.cpp')
-DEP_EXAMPLE := $(SRC_EXAMPLE:%.cpp=build/%.d)
-BIN_EXAMPLE := $(SRC_EXAMPLE:%.cpp=build/%)
+DEP_EXAMPLE := $(SRC_EXAMPLE:%.cpp=$(BUILD)/%.d)
+BIN_EXAMPLE := $(SRC_EXAMPLE:%.cpp=$(BUILD)/%)
 
 SRC_TEST := $(shell find test -name '*.cpp')
-DEP_TEST := $(SRC_TEST:%.cpp=build/%.d)
-BIN_TEST := $(SRC_TEST:%.cpp=build/%)
+DEP_TEST := $(SRC_TEST:%.cpp=$(BUILD)/%.d)
+BIN_TEST := $(SRC_TEST:%.cpp=$(BUILD)/%)
 
 # default
 all: .build_test .build_example
@@ -59,12 +67,12 @@ test: .build_test
 	@set -e; for T in $(BIN_TEST) ; do echo $$T ; $$T > $$T.log ; tail -1 $$T.log ; done
 
 # compile cpp
-build/%: %.cpp build/%.d
+$(BUILD)/%: %.cpp $(BUILD)/%.d
 	@mkdir -p $(@D)
 	$(CXX) $(CXXFLAGS) $< -o $@
 
 # generates include-dependency on the fly
-build/%.d: %.cpp
+$(BUILD)/%.d: %.cpp
 	@mkdir -p $(@D)
 	$(CXX) $(CXXFLAGS) -MM -MQ $@ $< -o $@
 
