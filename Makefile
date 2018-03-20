@@ -1,3 +1,6 @@
+.SUFFIXES:
+.SECONDARY:
+
 CXXFLAGS ?= -pedantic \
             -Wall -Wextra -Wshadow -Werror \
 						-std=c++11 -Iinclude
@@ -27,13 +30,13 @@ all: .build_test .build_example
 # help
 .PHONY: help
 help:
-	@echo "target:"
+	@echo "targets:"
 	@echo "  all (default): build tests and examples"
 	@echo "  test : run tests"
 	@echo "  clean : clean everything"
 	@echo "  help : show help"
 	@echo ""
-	@echo "options variable:"
+	@echo "option variables:"
 	@echo "  USE_PEGTL : use PEGTL library"
 	@echo "  NDEBUG : None Debug mode"
 	@echo ""

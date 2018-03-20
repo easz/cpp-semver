@@ -47,14 +47,15 @@ int main()
     run_test();
     std::cout << std::endl;
     std::cout << "[OK]" << std::endl;
+    return 0;
   }
   catch (...)
   {
     std::cout << std::endl;
     std::cout << "[FAILED]" << std::endl;
+    return 1;
   }
 
-  return 0;
 }
 
 #endif
