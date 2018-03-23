@@ -311,27 +311,27 @@ namespace semver
     /* parse syntactical representation @c syntax::range_set and convert it to sementical representation @c semantic::interval_set */
     semantic::interval_set parse(const syntax::range_set& input)
     {
-      semantic::interval_set or_set;
-      for (const syntax::range& range : input)
+      semantic::interval_set interval_set;
+      for (const syntax::range& range : input.or_set)
       {
         std::vector<semantic::interval> and_set;
-        for (const syntax::simple& simple : range)
+        for (const syntax::simple& simple : range.and_set)
           and_set.emplace_back(parse(simple));
         const std::unique_ptr<semantic::interval> conj = and_conj(and_set);
         if (conj)
-          or_set.emplace_back(std::move(*conj));
+          interval_set.or_set.emplace_back(std::move(*conj));
       }
-      return or_set;
+      return interval_set;
     }
 
     /* check if two @c semantic::interval_set intersect with each other */
     bool intersects(const semantic::interval_set& s1, const semantic::interval_set& s2)
     {
-      if (s1.empty() || s2.empty())
+      if (s1.or_set.empty() || s2.or_set.empty())
         return false;
 
-      for (const semantic::interval& intval_1 : s1)
-        for (const semantic::interval& intval_2 : s2)
+      for (const semantic::interval& intval_1 : s1.or_set)
+        for (const semantic::interval& intval_2 : s2.or_set)
           if (and_conj({ intval_1, intval_2 }))
             return true;
 
@@ -349,8 +349,8 @@ namespace semver
     {
       syntax::range_set parsed = parse(s);
 
-      if (!parsed.empty() && !parsed.at(0).empty())
-        return std::move(parsed.at(0).at(0));
+      if (!parsed.or_set.empty() && !parsed.or_set.at(0).and_set.empty())
+        return std::move(parsed.or_set.at(0).and_set.at(0));
 
       return{};
     }
@@ -384,13 +384,13 @@ namespace semver
     semantic::interval_set interval_set_1 = detail::parse(detail::parse(v1));
     semantic::interval_set interval_set_2 = detail::parse(detail::parse(v2));
 
-    if (interval_set_1.empty() && interval_set_2.empty())
+    if (interval_set_1.or_set.empty() && interval_set_2.or_set.empty())
       return true;
-    else if (interval_set_1.empty() != interval_set_2.empty())
+    else if (interval_set_1.or_set.empty() != interval_set_2.or_set.empty())
       return false;
 
-    for (const semantic::interval& interval_1 : interval_set_1)
-      for (const semantic::interval& interval_2 : interval_set_2)
+    for (const semantic::interval& interval_1 : interval_set_1.or_set)
+      for (const semantic::interval& interval_2 : interval_set_2.or_set)
         if (interval_1 == interval_2)
           return true;
 
@@ -409,13 +409,13 @@ namespace semver
     semantic::interval_set interval_set_1 = detail::parse(detail::parse(v1));
     semantic::interval_set interval_set_2 = detail::parse(detail::parse(v2));
 
-    if (!interval_set_1.empty() && interval_set_2.empty())
+    if (!interval_set_1.or_set.empty() && interval_set_2.or_set.empty())
       return true;
-    else if (interval_set_1.empty() || interval_set_2.empty())
+    else if (interval_set_1.or_set.empty() || interval_set_2.or_set.empty())
       return false;
 
-    for (const semantic::interval& interval_1 : interval_set_1)
-      for (const semantic::interval& interval_2 : interval_set_2)
+    for (const semantic::interval& interval_1 : interval_set_1.or_set)
+      for (const semantic::interval& interval_2 : interval_set_2.or_set)
         if (interval_1 > interval_2)
           return true;
 
@@ -452,13 +452,13 @@ namespace semver
     semantic::interval_set interval_set_v = detail::parse(detail::parse(version));
     semantic::interval_set interval_set_r = detail::parse(detail::parse(range));
 
-    if (!interval_set_v.empty() && interval_set_r.empty())
+    if (!interval_set_v.or_set.empty() && interval_set_r.or_set.empty())
       return true;
-    else if (interval_set_v.empty() || interval_set_r.empty())
+    else if (interval_set_v.or_set.empty() || interval_set_r.or_set.empty())
       return false;
 
-    for (const semantic::interval& interval_v : interval_set_v)
-      for (const semantic::interval& interval_r : interval_set_r)
+    for (const semantic::interval& interval_v : interval_set_v.or_set)
+      for (const semantic::interval& interval_r : interval_set_r.or_set)
         if (interval_v <= interval_r)
           return false;
 
@@ -471,13 +471,13 @@ namespace semver
     semantic::interval_set interval_set_v = detail::parse(detail::parse(version));
     semantic::interval_set interval_set_r = detail::parse(detail::parse(range));
 
-    if (interval_set_v.empty() && !interval_set_r.empty())
+    if (interval_set_v.or_set.empty() && !interval_set_r.or_set.empty())
       return true;
-    else if (interval_set_v.empty() || interval_set_r.empty())
+    else if (interval_set_v.or_set.empty() || interval_set_r.or_set.empty())
       return false;
 
-    for (const semantic::interval& interval_v : interval_set_v)
-      for (const semantic::interval& interval_r : interval_set_r)
+    for (const semantic::interval& interval_v : interval_set_v.or_set)
+      for (const semantic::interval& interval_r : interval_set_r.or_set)
         if (interval_v >= interval_r)
           return false;
 
@@ -490,7 +490,7 @@ namespace semver
     try
     {
       semantic::interval_set interval_set_s = detail::parse(detail::parse(s));
-      return !interval_set_s.empty();
+      return !interval_set_s.or_set.empty();
     }
     catch (semver_error const&)
     {

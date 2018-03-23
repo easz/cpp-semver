@@ -46,9 +46,10 @@ namespace semver
     /// an integer or wildcard
     struct xnumber
     {
+      /// represents an integer
       explicit xnumber(const int& val) : is_wildcard(false), value(val) {}
 
-      /// default represents '*'
+      /// represents '*'
       xnumber() : is_wildcard(true), value(0) {}
 
       bool is_wildcard;
@@ -70,10 +71,18 @@ namespace semver
     };
 
     /// intersection set (i.e. AND conjunction )
-    typedef std::vector< simple > range;
+    /// it can represents a hyphon or a simple set
+    struct range
+    {
+      bool as_hyphon = false; // hint to interpret the range as hyphon if possible
+      std::vector< simple > and_set;
+    };
 
     /// union set (i.e. OR conjunction )
-    typedef std::vector< range > range_set;
+    struct range_set
+    {
+      std::vector< range > or_set;
+    };
   };
 
   // ------------ semantic types ------------------------------------ //
@@ -113,7 +122,10 @@ namespace semver
     };
 
     /// interval set (i.e. OR conjunction )
-    typedef std::vector< interval > interval_set;
+    struct interval_set
+    {
+      std::vector< interval > or_set;
+    };
   };
 
   bool operator ==(const semantic::boundary& lhs, const semantic::boundary& rhs)

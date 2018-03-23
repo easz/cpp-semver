@@ -182,8 +182,9 @@ namespace semver
       syntax::simple to = parse_partial(hyphen_tokens.at(1));
       from.cmp = syntax::comparator::gte;
       to.cmp = syntax::comparator::lte;
-      hyphen.emplace_back(from);
-      hyphen.emplace_back(to);
+      hyphen.as_hyphon = true;
+      hyphen.and_set.emplace_back(from);
+      hyphen.and_set.emplace_back(to);
       return hyphen;
     }
     else if (input.find_first_not_of(any_space) != std::string::npos)
@@ -192,7 +193,7 @@ namespace semver
       std::vector<std::string> simple_tokens = split(reduce_space(input), " ", true);
       syntax::range simples;
       for (const std::string& simple_token : simple_tokens)
-        simples.emplace_back(parse_simple(simple_token));
+        simples.and_set.emplace_back(parse_simple(simple_token));
       return simples;
     }
     else
@@ -200,7 +201,7 @@ namespace semver
       //          ''
       // the input may be a blank string which is allowed as an implcit *.*.* range
       syntax::range implicit_set;
-      implicit_set.emplace_back(syntax::simple());
+      implicit_set.and_set.emplace_back(syntax::simple());
       return implicit_set;
     }
   }
@@ -212,7 +213,7 @@ namespace semver
     // range_set ::= range ( ( ' ' ) * '||' ( ' ' ) * range ) *
     std::vector<std::string> range_tokens = split(input, "||", true);
     for (const std::string& range_token : range_tokens)
-      result.emplace_back(parse_range(range_token));
+      result.or_set.emplace_back(parse_range(range_token));
 
     return result;
   }

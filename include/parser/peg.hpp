@@ -390,8 +390,9 @@ namespace peg
       to.cmp = syntax::comparator::lte;
 
       syntax::range hyphon;
-      hyphon.emplace_back(std::move(from));
-      hyphon.emplace_back(std::move(to));
+      hyphon.as_hyphon = true;
+      hyphon.and_set.emplace_back(std::move(from));
+      hyphon.and_set.emplace_back(std::move(to));
 
       stacks.stack_range.emplace_back(std::move(hyphon));
     }
@@ -407,7 +408,7 @@ namespace peg
       {
         // reduce all 'simple's to 1 'range'
         syntax::range simple_set;
-        simple_set.swap(stacks.stack_simple);
+        simple_set.and_set.swap(stacks.stack_simple);
         // imply stacks.stack_simple.clear();
         stacks.stack_range.emplace_back(std::move(simple_set));
       }
@@ -415,7 +416,7 @@ namespace peg
       {
         // the input may be a blank string which is allowed as an implcit *.*.* range
         syntax::range implicit_set;
-        implicit_set.emplace_back(syntax::simple());
+        implicit_set.and_set.emplace_back(syntax::simple());
         stacks.stack_range.emplace_back(std::move(implicit_set));
       }
     }
@@ -428,7 +429,7 @@ namespace peg
     static void apply(const Input&, syntax::range_set& result, internal::stacks& stacks)
     {
       // assign result
-      result.swap(stacks.stack_range);
+      result.or_set.swap(stacks.stack_range);
 
       // stack shall be cleared after a successful parse
       assert(!stacks.partial &&
