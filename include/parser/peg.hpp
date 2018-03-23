@@ -193,11 +193,8 @@ namespace peg
         stacks.partial = std::unique_ptr< syntax::simple >(new syntax::simple());
 
       try
-      { // parse a number
-        syntax::xnumber x_nr;
-        x_nr.is_wildcard = false;
-        x_nr.value = std::stoi(in.string());
-        stacks.partial->major = x_nr;
+      { //a parse a number
+        stacks.partial->major = syntax::xnumber(std::stoi(in.string()));
       }
       catch (std::invalid_argument&)
       { // or as a wildcard
@@ -216,10 +213,7 @@ namespace peg
 
       try
       { // parse a number
-        syntax::xnumber x_nr;
-        x_nr.is_wildcard = false;
-        x_nr.value = std::stoi(in.string());
-        stacks.partial->minor = x_nr;
+        stacks.partial->minor = syntax::xnumber(std::stoi(in.string()));
       }
       catch (std::invalid_argument&)
       { // or as a wildcard
@@ -238,10 +232,7 @@ namespace peg
 
       try
       { // parse a number
-        syntax::xnumber x_nr;
-        x_nr.is_wildcard = false;
-        x_nr.value = std::stoi(in.string());
-        stacks.partial->patch = x_nr;
+        stacks.partial->patch = syntax::xnumber(std::stoi(in.string()));
       }
       catch (std::invalid_argument&)
       { // or as a wildcard

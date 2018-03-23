@@ -43,11 +43,16 @@ namespace semver
       eq, lt, lte, gt, gte, tilde, caret
     };
 
-    /// default represents '*'
+    /// an integer or wildcard
     struct xnumber
     {
-      bool is_wildcard = true;
-      int value = 0;
+      explicit xnumber(const int& val) : is_wildcard(false), value(val) {}
+
+      /// default represents '*'
+      xnumber() : is_wildcard(true), value(0) {}
+
+      bool is_wildcard;
+      int value;
     };
 
     /// represents any type of 'simple', 'primitive', 'partial', 'tilde' or 'caret' from the grammar.

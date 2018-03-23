@@ -40,10 +40,7 @@ namespace semver
       return {};
 
     //        nr
-    syntax::xnumber nr;
-    nr.is_wildcard = false;
-    nr.value = parse_nr(input);
-    return nr;
+    return syntax::xnumber(parse_nr(input));
   }
 
   std::string parse_part(const std::string& input)
