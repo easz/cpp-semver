@@ -76,8 +76,8 @@ $(BUILD)/%.d: %.cpp
 	@mkdir -p $(@D)
 	$(CXX) $(CXXFLAGS) -MM -MQ $@ $< -o $@
 
-# include generated include-dependency if possible
-ifeq ($(findstring $(MAKECMDGOALS),clean),)
+# include generated include-dependency if necessary
+ifeq ($(filter clean help,$(MAKECMDGOALS)),)
 -include $(DEP_EXAMPLE)
 -include $(DEP_TEST)
 endif
