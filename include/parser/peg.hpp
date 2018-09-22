@@ -442,7 +442,7 @@ namespace peg
 
   // ------------------ Trigger PEGTL parser function ------------------------------ //
 
-  syntax::range_set parser(const std::string input)
+  inline syntax::range_set parser(const std::string input)
   {
     namespace pegtl = tao::TAO_PEGTL_NAMESPACE;
     try

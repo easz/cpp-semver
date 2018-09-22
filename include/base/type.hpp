@@ -128,7 +128,7 @@ namespace semver
     };
   };
 
-  bool operator ==(const semantic::boundary& lhs, const semantic::boundary& rhs)
+  inline bool operator ==(const semantic::boundary& lhs, const semantic::boundary& rhs)
   {
     return (lhs.major == rhs.major) &&
       (lhs.minor == rhs.minor) &&
@@ -137,12 +137,12 @@ namespace semver
       (lhs.is_max == rhs.is_max);
   }
 
-  bool operator !=(const semantic::boundary& lhs, const semantic::boundary& rhs)
+  inline bool operator !=(const semantic::boundary& lhs, const semantic::boundary& rhs)
   {
     return !(lhs == rhs);
   }
 
-  bool operator <(const semantic::boundary& lhs, const semantic::boundary& rhs)
+  inline bool operator <(const semantic::boundary& lhs, const semantic::boundary& rhs)
   {
     // TODO: improve the performance of comparison
 
@@ -180,22 +180,22 @@ namespace semver
     return false;
   }
 
-  bool operator >(const semantic::boundary& lhs, const semantic::boundary& rhs)
+  inline bool operator >(const semantic::boundary& lhs, const semantic::boundary& rhs)
   {
     return (lhs != rhs) && !(lhs < rhs);
   }
 
-  bool operator <=(const semantic::boundary& lhs, const semantic::boundary& rhs)
+  inline bool operator <=(const semantic::boundary& lhs, const semantic::boundary& rhs)
   {
     return (lhs < rhs) || (lhs == rhs);
   }
 
-  bool operator >=(const semantic::boundary& lhs, const semantic::boundary& rhs)
+  inline bool operator >=(const semantic::boundary& lhs, const semantic::boundary& rhs)
   {
     return (lhs > rhs) || (lhs == rhs);
   }
 
-  bool operator ==(const semantic::interval& lhs, const semantic::interval& rhs)
+  inline bool operator ==(const semantic::interval& lhs, const semantic::interval& rhs)
   {
     return (lhs.from_inclusive == rhs.from_inclusive) &&
       (lhs.to_inclusive == rhs.to_inclusive) &&
@@ -203,12 +203,12 @@ namespace semver
       (lhs.to == rhs.to);
   }
 
-  bool operator !=(const semantic::interval& lhs, const semantic::interval& rhs)
+  inline bool operator !=(const semantic::interval& lhs, const semantic::interval& rhs)
   {
     return !(lhs == rhs);
   }
 
-  bool operator <(const semantic::interval& lhs, const semantic::interval& rhs)
+  inline bool operator <(const semantic::interval& lhs, const semantic::interval& rhs)
   {
     if (lhs.to < rhs.from ||
       (lhs.to == rhs.from && (!lhs.to_inclusive || !rhs.from_inclusive)))
@@ -216,17 +216,17 @@ namespace semver
     return false;
   }
 
-  bool operator <=(const semantic::interval& lhs, const semantic::interval& rhs)
+  inline bool operator <=(const semantic::interval& lhs, const semantic::interval& rhs)
   {
     return (lhs < rhs) || (lhs == rhs);
   }
 
-  bool operator >(const semantic::interval& lhs, const semantic::interval& rhs)
+  inline bool operator >(const semantic::interval& lhs, const semantic::interval& rhs)
   {
     return (lhs != rhs) && !(lhs < rhs);
   }
 
-  bool operator >=(const semantic::interval& lhs, const semantic::interval& rhs)
+  inline bool operator >=(const semantic::interval& lhs, const semantic::interval& rhs)
   {
     return (lhs > rhs) || (lhs == rhs);
   }
