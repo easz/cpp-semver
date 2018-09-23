@@ -5,8 +5,7 @@
  * header-only C++11
  * parses semver string
  * inspired by [Semantic Versioning](https://semver.org/) and [NPM](https://docs.npmjs.com/misc/semver)
- * optional to use [PEGTL parser](https://github.com/taocpp/PEGTL)
-
+ 
 ### API handling string representation
 
    * ```semver::valid( v )```: return true if the given version or range is syntactically and semantically valid.
@@ -55,13 +54,12 @@ int main()
 }
 ```
 
-Build with zero-dependency:
+To build:
 ```
 > g++ -std=c++11 -Iinclude example/demo.cpp
 ```
 
-Or build with PEGTL:
-
+Or build with optional PEGTL parser: (to cross test, or to quickly evaluate any grammar change for development purpose.)
 ```
 > git submodule update --init --recursive
 > g++ -std=c++11 -D USE_PEGTL -Iinclude -IPEGTL/include example/demo.cpp
