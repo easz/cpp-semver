@@ -9,7 +9,7 @@
 
 namespace semver
 {
-  int parse_nr(const std::string& input)
+  inline int parse_nr(const std::string& input)
   {
     // nr ::= '0' | ['1'-'9'] ( ['0'-'9'] ) *
 
@@ -32,7 +32,7 @@ namespace semver
     }
   }
 
-  syntax::xnumber parse_xr(const std::string& input)
+  inline syntax::xnumber parse_xr(const std::string& input)
   {
     // xr ::=
     //        'x' | 'X' | '*' |
@@ -43,7 +43,7 @@ namespace semver
     return syntax::xnumber(parse_nr(input));
   }
 
-  std::string parse_part(const std::string& input)
+  inline std::string parse_part(const std::string& input)
   {
     // part  ::=
 
@@ -60,7 +60,7 @@ namespace semver
     return input;
   }
 
-  std::string parse_parts(const std::string& input)
+  inline std::string parse_parts(const std::string& input)
   {
     // parts ::= part ( '.' part ) *
 
@@ -71,7 +71,7 @@ namespace semver
     return input;
   }
 
-  syntax::simple parse_partial(const std::string& input)
+  inline syntax::simple parse_partial(const std::string& input)
   {
     // partial ::= xr ( '.' xr ( '.' xr ( '-' pre )? ( '+' build )? ? )? )?
     // pre     ::= parts
@@ -135,7 +135,7 @@ namespace semver
     return result;
   }
 
-  syntax::simple parse_simple(const std::string& input)
+  inline syntax::simple parse_simple(const std::string& input)
   {
     // simple ::= primitive | partial | tilde | caret
     // primitive  ::= ( '<' | '>' | '>=' | '<=' | '=' | ) partial
@@ -170,7 +170,7 @@ namespace semver
     return result;
   }
 
-  syntax::range parse_range(const std::string& input)
+  inline syntax::range parse_range(const std::string& input)
   {
     // range ::=
     std::vector<std::string> hyphen_tokens = split(input, " - ", true);
@@ -206,7 +206,7 @@ namespace semver
     }
   }
 
-  syntax::range_set parse_range_set(const std::string& input)
+  inline syntax::range_set parse_range_set(const std::string& input)
   {
     syntax::range_set result;
 
@@ -218,7 +218,7 @@ namespace semver
     return result;
   }
 
-  syntax::range_set parser(const std::string input)
+  inline syntax::range_set parser(const std::string input)
   {
     return parse_range_set(input);
   }

@@ -11,7 +11,7 @@ namespace semver
   const std::string any_alphabat = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz";
 
   // [    x y    z  ] -> [ x y z ]
-  std::string reduce_space(const std::string& str)
+  inline std::string reduce_space(const std::string& str)
   {
     std::string new_string;
     bool pre_space = false;
@@ -28,7 +28,7 @@ namespace semver
   }
 
   // [    x y    z  ] -> [x y    z]
-  std::string trim_string(const std::string& str)
+  inline std::string trim_string(const std::string& str)
   {
     size_t start = str.find_first_not_of(any_space);
     if (start == std::string::npos)
@@ -41,7 +41,7 @@ namespace semver
     return str.substr(start, end - start + 1);
   }
 
-  std::vector<std::string> split(const std::string& input, const std::string& delimiter, bool trim = false)
+  inline std::vector<std::string> split(const std::string& input, const std::string& delimiter, bool trim = false)
   {
     std::vector<std::string> result;
 

@@ -21,13 +21,13 @@ namespace semver
   namespace detail
   {
     /* parse version range in string into syntactical representation @c syntax::range_set */
-    syntax::range_set parse(const std::string& input)
+    inline syntax::range_set parse(const std::string& input)
     {
       return PARSER(input);
     }
 
     /* parse syntactical representation @c syntax::simple and convert it to sementical representation @c semantic::interval */
-    semantic::interval parse(const syntax::simple& input)
+    inline semantic::interval parse(const syntax::simple& input)
     {
       // default result * := [min, max]
       semantic::interval result;
@@ -227,7 +227,7 @@ namespace semver
     };
 
     /* calculate AND-conjunction from a list of @c semantic::interval */
-    std::unique_ptr<semantic::interval> and_conj(const std::vector< semantic::interval >& input)
+    inline std::unique_ptr<semantic::interval> and_conj(const std::vector< semantic::interval >& input)
     {
       const size_t size = input.size();
 
@@ -309,7 +309,7 @@ namespace semver
     }
 
     /* parse syntactical representation @c syntax::range_set and convert it to sementical representation @c semantic::interval_set */
-    semantic::interval_set parse(const syntax::range_set& input)
+    inline semantic::interval_set parse(const syntax::range_set& input)
     {
       semantic::interval_set interval_set;
       for (const syntax::range& range : input.or_set)
@@ -325,7 +325,7 @@ namespace semver
     }
 
     /* check if two @c semantic::interval_set intersect with each other */
-    bool intersects(const semantic::interval_set& s1, const semantic::interval_set& s2)
+    inline bool intersects(const semantic::interval_set& s1, const semantic::interval_set& s2)
     {
       if (s1.or_set.empty() || s2.or_set.empty())
         return false;
@@ -339,13 +339,13 @@ namespace semver
     }
 
     /* check if two @c syntax::range_set intersect with each other */
-    bool intersects(const syntax::range_set& rs1, const syntax::range_set& rs2)
+    inline bool intersects(const syntax::range_set& rs1, const syntax::range_set& rs2)
     {
       return intersects(parse(rs1), parse(rs2));
     }
 
     /** parse or cast as a syntax::simple if possible */
-    syntax::simple as_simple(const std::string& s)
+    inline syntax::simple as_simple(const std::string& s)
     {
       syntax::range_set parsed = parse(s);
 
@@ -361,25 +361,25 @@ namespace semver
 
 
   /** Return true if the comparator or range intersect */
-  bool intersects(const std::string& range)
+  inline bool intersects(const std::string& range)
   {
     return detail::intersects(detail::parse(range), detail::parse("*"));
   }
 
   /** Return true if the two supplied ranges or comparators intersect. */
-  bool intersects(const std::string& range1, const std::string& range2)
+  inline bool intersects(const std::string& range1, const std::string& range2)
   {
     return detail::intersects(detail::parse(range1), detail::parse(range2));
   }
 
   /**  Return true if the version satisfies the range */
-  bool satisfies(const std::string& version, const std::string& range)
+  inline bool satisfies(const std::string& version, const std::string& range)
   {
     return detail::intersects(detail::parse(version), detail::parse(range));
   }
 
   /** v1 == v2 */
-  bool eq(const std::string& v1, const std::string& v2)
+  inline bool eq(const std::string& v1, const std::string& v2)
   {
     semantic::interval_set interval_set_1 = detail::parse(detail::parse(v1));
     semantic::interval_set interval_set_2 = detail::parse(detail::parse(v2));
@@ -398,13 +398,13 @@ namespace semver
   }
 
   /** v1 != v2 */
-  bool neq(const std::string& v1, const std::string& v2)
+  inline bool neq(const std::string& v1, const std::string& v2)
   {
     return !eq(v1, v2);
   }
 
   /** v1 > v2 */
-  bool gt(const std::string& v1, const std::string& v2)
+  inline bool gt(const std::string& v1, const std::string& v2)
   {
     semantic::interval_set interval_set_1 = detail::parse(detail::parse(v1));
     semantic::interval_set interval_set_2 = detail::parse(detail::parse(v2));
@@ -423,7 +423,7 @@ namespace semver
   }
 
   /** v1 >= v2 */
-  bool gte(const std::string& v1, const std::string& v2)
+  inline bool gte(const std::string& v1, const std::string& v2)
   {
     if (eq(v1, v2) || gt(v1, v2))
       return true;
@@ -431,7 +431,7 @@ namespace semver
   }
 
   /** v1 < v2 */
-  bool lt(const std::string& v1, const std::string& v2)
+  inline bool lt(const std::string& v1, const std::string& v2)
   {
     if (!eq(v1, v2) && !gt(v1, v2))
       return true;
@@ -439,7 +439,7 @@ namespace semver
   }
 
   /** v1 <= v2 */
-  bool lte(const std::string& v1, const std::string& v2)
+  inline bool lte(const std::string& v1, const std::string& v2)
   {
     if (eq(v1, v2) || lt(v1, v2))
       return true;
@@ -447,7 +447,7 @@ namespace semver
   }
 
   /** Return true if version is greater than all the versions possible in the range. */
-  bool gtr(const std::string& version, const std::string& range)
+  inline bool gtr(const std::string& version, const std::string& range)
   {
     semantic::interval_set interval_set_v = detail::parse(detail::parse(version));
     semantic::interval_set interval_set_r = detail::parse(detail::parse(range));
@@ -466,7 +466,7 @@ namespace semver
   }
 
   /** Return true if version is less than all the versions possible in the range. */
-  bool ltr(const std::string& version, const std::string& range)
+  inline bool ltr(const std::string& version, const std::string& range)
   {
     semantic::interval_set interval_set_v = detail::parse(detail::parse(version));
     semantic::interval_set interval_set_r = detail::parse(detail::parse(range));
@@ -485,7 +485,7 @@ namespace semver
   }
 
   /** Return true if the version or range is valid */
-  bool valid(const std::string& s)
+  inline bool valid(const std::string& s)
   {
     try
     {
@@ -499,28 +499,28 @@ namespace semver
   }
 
   /** Return the major version number. */
-  int major(const std::string& version)
+  inline int major(const std::string& version)
   {
     const auto& major = detail::as_simple(version).major;
     return !major.is_wildcard ? major.value : 0;
   }
 
   /** Return the minor version number. */
-  int minor(const std::string& version)
+  inline int minor(const std::string& version)
   {
     const auto& minor = detail::as_simple(version).minor;
     return !minor.is_wildcard ? minor.value : 0;
   }
 
   /** Return the patch version number. */
-  int patch(const std::string& version)
+  inline int patch(const std::string& version)
   {
     const auto& patch = detail::as_simple(version).patch;
     return !patch.is_wildcard ? patch.value : 0;
   }
 
   /** Returns an array of prerelease components. */
-  std::vector<std::string> prerelease(const std::string& version)
+  inline std::vector<std::string> prerelease(const std::string& version)
   {
     const auto& pre = detail::as_simple(version).pre;
     if (pre.empty())
