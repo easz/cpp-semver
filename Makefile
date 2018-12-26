@@ -5,7 +5,7 @@ BUILD := build
 
 CXXFLAGS ?= -pedantic \
             -Wall -Wextra -Wshadow -Werror \
-						-std=c++11 -Iinclude
+            -std=c++11 -Iinclude
 
 ifdef NDEBUG
 CXXFLAGS += -D NDEBUG
