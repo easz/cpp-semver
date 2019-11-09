@@ -4,7 +4,7 @@
 
  * header-only C++11
  * parses semver string
- * inspired by [Semantic Versioning](https://semver.org/) and [NPM](https://docs.npmjs.com/misc/semver)
+ * inspired by [Semantic Versioning](https://semver.org/) and [npm-semver](https://docs.npmjs.com/misc/semver)
  
 ### API handling string representation
 
