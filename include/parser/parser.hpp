@@ -4,6 +4,7 @@
 #include "../base/type.hpp"
 #include "../base/util.hpp"
 
+#include <stdexcept>
 #include <vector>
 #include <string>
 

@@ -7,6 +7,7 @@
 
 #include <memory>
 #include <cassert>
+#include <stdexcept>
 
 namespace peg
 {
