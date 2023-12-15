@@ -1,6 +1,6 @@
-#include "cpp-semver.hpp"
-
 #include <iostream>
+
+#include "cpp-semver.hpp"
 
 int main()
 {
